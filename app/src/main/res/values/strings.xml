@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">async</string>
+    <string name="heavy">heavy</string>
+    <string name="soft">soft</string>
+    <string name="gif_desc">animated background of rain</string>
+    <string name="thunder_desc">enables or disables thunder sound effects</string>
+    <string name="rain_desc">enables or disables the audio sounding like it\'s behind a window</string>
+    <string name="title">async.</string>
+    <string name="start">start</string>
+    <string name="start_desc">starts the application</string>
+    <string name="title_desc">the title of the application</string>
+</resources>

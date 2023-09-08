@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="#A4C3D2"
+    android:fillViewport="true"
+    style="@style/ThemeActionBar"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/rain1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:contentDescription="@string/gif_desc"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/heavy_rain" />
+
+    <ImageView
+        android:id="@+id/windowSheet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/empty"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="366dp"
+        android:layout_height="63dp"
+        android:background="@drawable/button1"
+        android:foregroundGravity="center"
+        android:gravity="center"
+        android:layoutDirection="inherit"
+        android:spinnerMode="dropdown"
+        android:popupBackground="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/window" />
+
+    <Button
+        android:contentDescription="@string/rain_desc"
+        android:id="@+id/window"
+        android:layout_width="62dp"
+        android:layout_height="61dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/windowbutton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.046"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.87"/>
+
+    <Button
+        android:contentDescription="@string/thunder_desc"
+        android:id="@+id/thunder"
+        android:layout_width="62dp"
+        android:layout_height="61dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/thunder"
+        app:layout_constraintBottom_toTopOf="@+id/window"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.97" />
+
+    <TextView
+        android:id="@+id/transition2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/spinner"
+        android:alpha="1"
+        android:background="#A4C3D2"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

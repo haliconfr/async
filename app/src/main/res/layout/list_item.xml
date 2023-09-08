@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
+
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/itemText"
+        android:layout_width="366dp"
+        android:layout_height="63dp"
+        android:background="@drawable/button2"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="@string/soft"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:textStyle="italic" />
+</LinearLayout>
