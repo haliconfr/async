@@ -66,7 +66,7 @@ public class BasedMediaPlayer {
                     mCurrentPlayer = mNextPlayer;
                     createNextMediaPlayerRaw();
                     mediaPlayer.release();
-                    Log.d("balls", "looped");
+                    Log.d("yeah", "looped");
                 }
             };
 

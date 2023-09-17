@@ -19,8 +19,9 @@ import java.util.Random;
 
 public class thunderService extends Service {
     Random rand = new Random();
+    String sound;
     MediaPlayer mp;
-    public boolean ready, first;
+    public boolean ready;
     String resprefix = "android.resource://com.halicon.async/raw/";
     boolean enabled;
     Thread thread;
@@ -31,8 +32,12 @@ public class thunderService extends Service {
     }
     public int onStartCommand(Intent intent, int flags, int startId) {
         enabled = intent.getExtras().getBoolean("enabled");
+        sound = intent.getExtras().getString("sound");
+        Log.d("yeah", sound + " service started");
         if(enabled){
             ready = true;
+        }else{
+            ready = false;
         }
         try {
             startAudio();
@@ -51,34 +56,28 @@ public class thunderService extends Service {
                             mp = new MediaPlayer();
                             mp.setLooping(false);
                             mp.setVolume(1.0f,1.0f);
-                            mp.setAudioAttributes(new AudioAttributes.Builder()
-                                    .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
-                                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                                    .setUsage(AudioAttributes.USAGE_ALARM)
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                    .build());
                             int random = rand.nextInt(7 - 1) + 1;
                             switch(random){
                                 case 1:
-                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + "thunder_1"));
+                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + sound+"_1"));
                                     break;
                                 case 2:
-                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + "thunder_2"));
+                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + sound+"_2"));
                                     break;
                                 case 3:
-                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + "thunder_3"));
+                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + sound+"_3"));
                                     break;
                                 case 4:
-                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + "thunder_4"));
+                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + sound+"_4"));
                                     break;
                                 case 5:
-                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + "thunder_5"));
+                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + sound+"_5"));
                                     break;
                                 case 6:
-                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + "thunder_6"));
+                                    mp.setDataSource(thunderService.this, Uri.parse(resprefix + sound+"_6"));
                                     break;
                             }
-                            Log.d("balls", "thunder sound effect " + random + " started");
+                            Log.d("yeah", "sound effect " + random + " started");
                             mp.prepare();
                             mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                 @Override
@@ -86,11 +85,12 @@ public class thunderService extends Service {
                                     mp.start();
                                 }
                             });
-                            sleep(rand.nextInt(70000 - 10000) + 10000);
+                            sleep(rand.nextInt(80000 - 20000) + 20000);
                             mp.stop();
                         }else{
                             mp.stop();
                             ready = false;
+                            thread.interrupt();
                             Log.d("balls", "thread ended!");
                         }
                     }

@@ -2,20 +2,16 @@ package com.halicon.async;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
-import android.app.Service;
+import android.animation.Animator;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
 import android.util.Log;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,50 +21,60 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     Spinner spinner;
-    Button window, thunder;
-    boolean enabled;
+    Button window;
+    Button[] sounds = new Button[5];
+    Boolean[] fxEnabled = new Boolean[5];
     ImageView windowSheet;
-    public static Boolean buttonsEnabled = true;
     String mode, name, selected, previousItem;
     ImageView rain1;
+    TextView transitionView;
     boolean windowSelected;
     int previousItemIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        buttonsEnabled = true;
         setContentView(R.layout.activity_main);
+        ImageView settings = findViewById(R.id.settings);
+        if(MainVariables.timer != 0){
+            timer();
+        }
+        if(getIntent().getBooleanExtra("init", false)){
+            settings.setAlpha(0.0f);
+            settings.animate().alpha(1.0f).setDuration(2000);
+        }
         selected = " ";
-        TextView transitionView = findViewById(R.id.transition2);
+        transitionView = findViewById(R.id.transition2);
+        transitionView.setVisibility(View.VISIBLE);
         transitionView.setAlpha(1);
-        transitionView.animate().alpha(0.0f).setDuration(2000);
         rain1 = findViewById(R.id.rain1);
         spinner = findViewById(R.id.spinner);
         window = findViewById(R.id.window);
         windowSheet = findViewById(R.id.windowSheet);
-        thunder = findViewById(R.id.thunder);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transition(Settings.class);
+            }
+        });
+        sounds[0] = findViewById(R.id.sound1);
+        sounds[1] = findViewById(R.id.sound2);
+        sounds[2] = findViewById(R.id.sound3);
+        sounds[3] = findViewById(R.id.sound4);
+        sounds[4] = findViewById(R.id.sound5);
+        initMenu();
         window.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (buttonsEnabled) {
-                    enableWindow();
-                }
-            }
-        });
-        thunder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startThunder();
+                enableWindow();
             }
         });
         String[] array_spinner = new String[2];
@@ -80,13 +86,8 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!buttonsEnabled) {
-                    spinner.setSelection(previousItemIndex);
-                    return;
-                }
                 previousItemIndex = i;
                 previousItem = selected;
-                buttonsEnabled = false;
                 selected = spinner.getSelectedItem().toString();
                 animateRain();
                 startAudio();
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        transitionView.animate().alpha(0.0f).setDuration(2000);
     }
 
     void startAudio() {
@@ -105,18 +107,22 @@ public class MainActivity extends AppCompatActivity {
         startService(intent);
     }
 
-    void startThunder() {
-        Intent thunderIntent = new Intent(this, thunderService.class);
-        if (enabled) {
-            thunder.setForeground(ResourcesCompat.getDrawable(getResources(), R.drawable.thunder, null));
-            thunderIntent.putExtra("enabled", false);
-            enabled = false;
+    void startSFX(Button button, String sound) {
+        Intent fxIntent = new Intent(this, thunderService.class);
+        if (fxEnabled[Arrays.asList(sounds).indexOf(button)]) {
+            button.setForeground(getResources().getDrawable(getResources()
+                    .getIdentifier(sound, "drawable", getPackageName())));
+            fxIntent.putExtra("enabled", false);
+            fxIntent.putExtra("sound", sound);
+            fxEnabled[Arrays.asList(sounds).indexOf(button)] = false;
         } else {
-            thunder.setForeground(ResourcesCompat.getDrawable(getResources(), R.drawable.thunder_pressed, null));
-            thunderIntent.putExtra("enabled", true);
-            enabled = true;
+            button.setForeground(getResources().getDrawable(getResources()
+                    .getIdentifier(sound + "_pressed", "drawable", getPackageName())));
+            fxIntent.putExtra("enabled", true);
+            fxIntent.putExtra("sound", sound);
+            fxEnabled[Arrays.asList(sounds).indexOf(button)] = true;
         }
-        startService(thunderIntent);
+        startService(fxIntent);
     }
 
     String getPath() {
@@ -162,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             startAudio();
             Glide.with(MainActivity.this)
                     .load(R.drawable.window)
-                    .transition(DrawableTransitionOptions.withCrossFade(1000))
+                    .transition(DrawableTransitionOptions.withCrossFade(500))
                     .apply(new RequestOptions().override(1080, 1920)
                             .error(R.drawable.icon).centerCrop()
                     )
@@ -173,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
             startAudio();
             Glide.with(MainActivity.this)
                     .load(R.drawable.empty)
-                    .transition(DrawableTransitionOptions.withCrossFade(1000))
+                    .transition(DrawableTransitionOptions.withCrossFade(500))
                     .apply(new RequestOptions().override(1080, 1920)
                             .error(R.drawable.icon).centerCrop()
                     )
@@ -182,22 +188,62 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void timer() {
-        if (MainVariables.timer != 0) {
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(MainVariables.timer);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    finishAffinity();
-                    System.exit(0);
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    sleep((long) (MainVariables.timer * 60000));
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-
-                ;
-            };
-            thread.start();
+                finishAffinity();
+                System.exit(0);
+            }
+        };
+        thread.start();
+    }
+    void initMenu(){
+        if(MainVariables.enabled != null){
+            String[] names;
+            names=MainVariables.enabled.split(" ");
+            for(String name : names){
+                int i = Arrays.asList(names).indexOf(name);
+                sounds[i].setVisibility(View.VISIBLE);
+                sounds[i].setForeground(getResources().getDrawable(getResources()
+                        .getIdentifier(name, "drawable", getPackageName())));
+                fxEnabled[i] = true;
+                sounds[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startSFX((Button) view, name);
+                    }
+                });
+            }
         }
+    }
+    void transition(Class destination){
+        transitionView.animate().alpha(1.0f).setDuration(1000).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(@NonNull Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(@NonNull Animator animator) {
+                Intent intent = new Intent(MainActivity.this, destination);
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+            }
+
+            @Override
+            public void onAnimationCancel(@NonNull Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(@NonNull Animator animator) {
+
+            }
+        });
     }
 }

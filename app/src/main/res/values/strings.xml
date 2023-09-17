@@ -9,4 +9,5 @@
     <string name="start">start</string>
     <string name="start_desc">starts the application</string>
     <string name="title_desc">the title of the application</string>
+    <string name="settings">settings</string>
 </resources>

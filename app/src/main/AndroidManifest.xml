@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <application
-        android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,8 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Async"
         tools:targetApi="31">
-        <service android:name=".soundService"/>
-        <service android:name=".thunderService"/>
+        <service android:name=".soundService" android:enabled="true"/>
+        <service android:name=".thunderService" android:enabled="true"/>
         <activity
             android:name=".MainActivity"
             android:hardwareAccelerated="true"
@@ -28,6 +26,11 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".Settings"
+            android:hardwareAccelerated="true"
+            android:exported="true">
         </activity>
         <meta-data
             android:name="preloaded_fonts"

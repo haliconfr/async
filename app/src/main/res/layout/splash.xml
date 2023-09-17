@@ -11,10 +11,10 @@
     tools:context=".MainActivity" >
 
     <TextView
-        android:contentDescription="@string/title_desc"
         android:id="@+id/textView"
         android:layout_width="140dp"
         android:layout_height="51dp"
+        android:contentDescription="@string/title_desc"
         android:fontFamily="serif"
         android:gravity="center"
         android:text="@string/title"
@@ -23,52 +23,12 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/startButton"
-        android:contentDescription="@string/start_desc"
-        android:layout_width="142dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/start_button"
-        android:fontFamily="serif"
-        android:gravity="center"
-        android:popupBackground="@android:color/transparent"
-        android:text="@string/start"
-        android:textColor="@color/white"
-        android:textSize="17sp"
-        android:textStyle="italic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.100000024" />
-
-    <TextView
-        android:id="@+id/startArrow"
-        android:layout_width="142dp"
-        android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/start_button"
-        android:contentDescription="@string/start_desc"
-        android:fontFamily="serif"
-        android:gravity="center"
-        android:popupBackground="@android:color/transparent"
-        android:text="@string/start"
-        android:textColor="@color/white"
-        android:textSize="17sp"
-        android:textStyle="italic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.100000024" />
-
-    <TextView
-        android:id="@+id/transition"
+        android:id="@+id/setTransition"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#A4C3D2"
@@ -77,4 +37,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
