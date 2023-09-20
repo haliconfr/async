@@ -2,11 +2,11 @@ package com.halicon.async;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -16,16 +16,21 @@ import androidx.appcompat.app.AppCompatActivity;
 public class Settings extends AppCompatActivity {
     Spinner spinner;
     View[] icons = new View[2];
-    boolean first;
+    ImageView start;
     TextView transitionView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
-        ImageView start = findViewById(R.id.startSet);
+        start = findViewById(R.id.startSet);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                start.setClickable(false);
+                SharedPreferences.Editor editor = getSharedPreferences("settings",0).edit();
+                editor.putString("sounds", MainVariables.enabled);
+                editor.putInt("timer", MainVariables.timer);
+                editor.apply();
                 transition();
             }
         });
@@ -36,8 +41,15 @@ public class Settings extends AppCompatActivity {
         }
         transitionView = findViewById(R.id.setTransition);
         transitionView.setAlpha(1);
-        transitionView.animate().alpha(0.0f).setDuration(1000);
+        transitionView.animate().alpha(0.0f).setDuration(500);
         spinner = findViewById(R.id.timer);
+        ImageView advanced = findViewById(R.id.moresounds);
+        advanced.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //setContentView()
+            }
+        });
         String[] array_spinner = new String[4];
         array_spinner[0] = "8 hours";
         array_spinner[1] = "2 hours";
@@ -46,11 +58,24 @@ public class Settings extends AppCompatActivity {
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<String>(this, R.layout.list_item, R.id.itemText, array_spinner);
         spinner.setAdapter(adapter);
-        spinner.setSelection(3);
+        switch(MainVariables.timer){
+            case(0):
+                spinner.setSelection(3);
+                break;
+            case(30):
+                spinner.setSelection(2);
+                break;
+            case(120):
+                spinner.setSelection(1);
+                break;
+            case(480):
+                spinner.setSelection(0);
+                break;
+        }
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                double timer = 0;
+                int timer = 0;
                 switch (i){
                     case(0):
                         timer = 480;
@@ -65,9 +90,7 @@ public class Settings extends AppCompatActivity {
                         timer = 0;
                         break;
                 }
-                if(!first){
-                    MainVariables.timer = timer;
-                }
+                MainVariables.timer = timer;
             }
 
             @Override
@@ -100,7 +123,7 @@ public class Settings extends AppCompatActivity {
         });
     }
     void transition(){
-        transitionView.animate().alpha(1.0f).setDuration(1500).setListener(new Animator.AnimatorListener() {
+        transitionView.animate().alpha(1.0f).setDuration(500).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(@NonNull Animator animator) {
 
@@ -108,6 +131,7 @@ public class Settings extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(@NonNull Animator animator) {
+                start.setClickable(true);
                 Intent intent = new Intent(Settings.this, MainActivity.class);
                 intent.putExtra("intent", false);
                 startActivity(intent);

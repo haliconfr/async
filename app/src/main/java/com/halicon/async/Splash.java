@@ -2,6 +2,7 @@ package com.halicon.async;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,10 +18,12 @@ public class Splash extends AppCompatActivity {
     TextView transitionView;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainVariables.enabled = "thunder ";
         setContentView(R.layout.splash);
         transitionView = findViewById(R.id.setTransition);
         transitionView.setAlpha(0);
+        SharedPreferences sp = getSharedPreferences("settings",0);
+        MainVariables.enabled = sp.getString("sounds", "thunder ");
+        MainVariables.timer = sp.getInt("timer", 0);
         transition(MainActivity.class);
     }
     void transition(Class destination){

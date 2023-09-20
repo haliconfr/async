@@ -9,6 +9,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SoundEffectConstants;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     Boolean[] fxEnabled = new Boolean[5];
     ImageView windowSheet;
     String mode, name, selected, previousItem;
-    ImageView rain1;
+    ImageView rain1, settings;
     TextView transitionView;
     boolean windowSelected;
     int previousItemIndex = 0;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ImageView settings = findViewById(R.id.settings);
+        settings = findViewById(R.id.settings);
         if(MainVariables.timer != 0){
             timer();
         }
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                settings.setClickable(false);
                 transition(Settings.class);
             }
         });
@@ -89,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
                 previousItemIndex = i;
                 previousItem = selected;
                 selected = spinner.getSelectedItem().toString();
+                SharedPreferences.Editor editor = getSharedPreferences("settings",0).edit();
+                editor.putInt("spinnerSelection", i);
+                editor.apply();
                 animateRain();
                 startAudio();
             }
@@ -98,7 +103,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        transitionView.animate().alpha(0.0f).setDuration(2000);
+        SharedPreferences sp = getSharedPreferences("settings",0);
+        int selection = sp.getInt("spinnerSelection", 1);
+        spinner.setSelection(selection);
+        transitionView.animate().alpha(0.0f).setDuration(1500);
     }
 
     void startAudio() {
@@ -192,7 +200,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    sleep((long) (MainVariables.timer * 60000));
+                    sleep(MainVariables.timer * 60000L);
+                    Intent intent = new Intent(MainActivity.this, soundService.class);
+                    intent.putExtra("path", "android.resource://com.halicon.async/raw/silence");
+                    startService(intent);
+                    sleep(3000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -203,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
     void initMenu(){
-        if(MainVariables.enabled != null){
+        if(!Objects.equals(MainVariables.enabled, "")){
             String[] names;
             names=MainVariables.enabled.split(" ");
             for(String name : names){
@@ -222,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     void transition(Class destination){
-        transitionView.animate().alpha(1.0f).setDuration(1000).setListener(new Animator.AnimatorListener() {
+        transitionView.animate().alpha(1.0f).setDuration(500).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(@NonNull Animator animator) {
 
@@ -230,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(@NonNull Animator animator) {
+                settings.setClickable(true);
                 Intent intent = new Intent(MainActivity.this, destination);
                 startActivity(intent);
                 overridePendingTransition(0, 0);

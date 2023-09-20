@@ -95,17 +95,35 @@
 
     <ImageView
         android:id="@+id/moresounds"
-        android:layout_width="236dp"
-        android:layout_height="88dp"
+        android:layout_width="192dp"
+        android:layout_height="63dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="@drawable/more_button"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/sleepText"
         app:layout_constraintEnd_toEndOf="@+id/setTransition"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trafficSet"
         app:layout_constraintVertical_bias="0.127" />
+
+    <TextView
+        android:id="@+id/moresoundsText"
+        android:layout_width="126dp"
+        android:layout_height="36dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="more sounds"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/moresounds"
+        app:layout_constraintEnd_toEndOf="@+id/moresounds"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="@+id/moresounds"
+        app:layout_constraintTop_toTopOf="@+id/moresounds" />
 
     <TextView
         android:id="@+id/setTransition"
