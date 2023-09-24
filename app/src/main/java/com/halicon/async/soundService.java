@@ -38,6 +38,7 @@ public class soundService extends Service {
     }
     void switchMPs(){
         if(ready) {
+            loop();
             switch (currentMP) {
                 case 1:
                     try {
@@ -60,7 +61,6 @@ public class soundService extends Service {
         ready = false;
         mp = new MediaPlayer();
         mp.setVolume(0.0f,0.0f);
-        mp.setLooping(true);
         mpVolume = 0.0f;
         try {
             mp.setDataSource(soundService.this, Uri.parse(path));
@@ -112,7 +112,6 @@ public class soundService extends Service {
         ready = false;
         mp2 = new MediaPlayer();
         mp2.setVolume(0.0f,0.0f);
-        mp2.setLooping(true);
         mp2Volume = 0.0f;
         try {
             mp2.setDataSource(soundService.this, Uri.parse(path));
@@ -165,6 +164,22 @@ public class soundService extends Service {
                         if (path != oldPath) {
                             switchMPs();
                         }
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        thread.start();
+    }
+    void loop(){
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        sleep(150000);
+                        switchMPs();
                     }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);

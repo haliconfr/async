@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
                 sounds[i].setVisibility(View.VISIBLE);
                 sounds[i].setForeground(getResources().getDrawable(getResources()
                         .getIdentifier(name, "drawable", getPackageName())));
-                fxEnabled[i] = true;
+                fxEnabled[i] = false;
                 sounds[i].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
