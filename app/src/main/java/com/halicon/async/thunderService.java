@@ -91,7 +91,7 @@ public class thunderService extends Service {
                             mp.stop();
                             ready = false;
                             thread.interrupt();
-                            Log.d("balls", "thread ended!");
+                            Log.d("yeah", "thread ended!");
                         }
                     }
                 } catch (IOException | InterruptedException e) {
