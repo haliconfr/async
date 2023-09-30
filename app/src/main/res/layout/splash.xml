@@ -27,6 +27,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/walkthrough1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/setTransition"
+        app:layout_constraintStart_toStartOf="@+id/setTransition"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/walkthrough1"></ImageView>
+
+    <ImageView
+        android:id="@+id/walkthrough2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/setTransition"
+        app:layout_constraintStart_toStartOf="@+id/setTransition"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/walkthrough2"></ImageView>
+
+    <ImageView
+        android:id="@+id/walkthrough3"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/setTransition"
+        app:layout_constraintStart_toStartOf="@+id/setTransition"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/walkthrough3"></ImageView>
+
     <TextView
         android:id="@+id/setTransition"
         android:layout_width="fill_parent"

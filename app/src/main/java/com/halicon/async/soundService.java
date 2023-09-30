@@ -2,6 +2,7 @@ package com.halicon.async;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
@@ -10,9 +11,10 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class soundService extends Service {
-    int currentMP;
+    int currentMP, duration;
     float mpVolume, mp2Volume;
     MediaPlayer mp, mp2;
     String path;
@@ -24,7 +26,10 @@ public class soundService extends Service {
         super.onCreate();
     }
     public int onStartCommand(Intent intent, int flags, int startId) {
-        path = intent.getExtras().getString("path");
+        path = MainVariables.path;
+        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+        metaRetriever.setDataSource(soundService.this, Uri.parse(path));
+        duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
         if (!first) {
             try {
                 startAudio(path);
@@ -38,7 +43,6 @@ public class soundService extends Service {
     }
     void switchMPs(){
         if(ready) {
-            loop();
             switch (currentMP) {
                 case 1:
                     try {
@@ -58,6 +62,7 @@ public class soundService extends Service {
         }
     }
     void startAudio(String path) throws IOException {
+        loop();
         ready = false;
         mp = new MediaPlayer();
         mp.setVolume(0.0f,0.0f);
@@ -160,8 +165,12 @@ public class soundService extends Service {
                 try {
                     while (true) {
                         String oldPath = path;
-                        sleep(5000);
-                        if (path != oldPath) {
+                        sleep(1000);
+                        if (!Objects.equals(MainVariables.path, oldPath)) {
+                            while(!ready){
+                                sleep(500);
+                            }
+                            path = MainVariables.path;
                             switchMPs();
                         }
                     }
@@ -178,7 +187,10 @@ public class soundService extends Service {
             public void run() {
                 try {
                     while (true) {
-                        sleep(150000);
+                        sleep(duration - 5000);
+                        while(!ready){
+                            sleep(500);
+                        }
                         switchMPs();
                     }
                 } catch (InterruptedException e) {

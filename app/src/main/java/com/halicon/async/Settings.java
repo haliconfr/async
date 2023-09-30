@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,15 +13,34 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.ProductDetailsResponseListener;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryProductDetailsParams;
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 public class Settings extends AppCompatActivity {
     Spinner spinner;
     View[] icons = new View[2];
     ImageView start;
     TextView transitionView;
+    BillingClient billingClient;
+    ProductDetails productDetails;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        billingClient = BillingClient.newBuilder(getApplicationContext())
+                .setListener(purchasesUpdatedListener)
+                .enablePendingPurchases()
+                .build();
         setContentView(R.layout.settings);
         start = findViewById(R.id.startSet);
         start.setOnClickListener(new View.OnClickListener() {
@@ -43,11 +63,12 @@ public class Settings extends AppCompatActivity {
         transitionView.setAlpha(1);
         transitionView.animate().alpha(0.0f).setDuration(500);
         spinner = findViewById(R.id.timer);
-        ImageView advanced = findViewById(R.id.moresounds);
+        ImageView advanced = findViewById(R.id.moresoundsTransition);
         advanced.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //setContentView()
+                advanced.setClickable(false);
+                moreSounds();
             }
         });
         String[] array_spinner = new String[4];
@@ -133,7 +154,6 @@ public class Settings extends AppCompatActivity {
             public void onAnimationEnd(@NonNull Animator animator) {
                 start.setClickable(true);
                 Intent intent = new Intent(Settings.this, MainActivity.class);
-                intent.putExtra("intent", false);
                 startActivity(intent);
                 overridePendingTransition(0, 0);
             }
@@ -149,4 +169,149 @@ public class Settings extends AppCompatActivity {
             }
         });
     }
+    void moreSounds(){
+        transitionView.animate().alpha(1.0f).setDuration(500).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(@NonNull Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(@NonNull Animator animator) {
+                setContentView(R.layout.moresounds);
+                ImageView purchase = findViewById(R.id.moresounds);
+                TextView transition = findViewById(R.id.moreTransition);
+                transition.setAlpha(1);
+                transition.animate().alpha(0.0f).setDuration(500);
+                ImageView back = findViewById(R.id.backMore);
+                back.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        back.setClickable(false);
+                        transition.animate().alpha(1.0f).setDuration(500).setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(@NonNull Animator animator) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(@NonNull Animator animator) {
+                                Intent intent = new Intent(Settings.this, Settings.class);
+                                startActivity(intent);
+                                overridePendingTransition(0, 0);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(@NonNull Animator animator) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(@NonNull Animator animator) {
+
+                            }
+                        });
+                    }
+                });
+                purchase.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        buyPremium();
+                    }
+                });
+                overridePendingTransition(0, 0);
+            }
+
+            @Override
+            public void onAnimationCancel(@NonNull Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(@NonNull Animator animator) {
+
+            }
+        });
+    }
+    void buyPremium(){
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK) {
+                    QueryProductDetailsParams queryProductDetailsParams =
+                            QueryProductDetailsParams.newBuilder()
+                                    .setProductList(
+                                            ImmutableList.of(
+                                                    QueryProductDetailsParams.Product.newBuilder()
+                                                            .setProductId("premium")
+                                                            .setProductType(BillingClient.ProductType.INAPP)
+                                                            .build()))
+                                    .build();
+
+                    billingClient.queryProductDetailsAsync(
+                            queryProductDetailsParams,
+                            new ProductDetailsResponseListener() {
+                                public void onProductDetailsResponse(BillingResult billingResult,
+                                                                     List<ProductDetails> productDetailsList) {
+                                    productDetails = productDetailsList.get(0);
+                                }
+                            }
+                    );
+                    ImmutableList productDetailsParamsList =
+                            ImmutableList.of(
+                                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                                            .setProductDetails(productDetails)
+                                            .build()
+                            );
+
+                    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                            .setProductDetailsParamsList(productDetailsParamsList)
+                            .build();
+                    billingResult = billingClient.launchBillingFlow(Settings.this, billingFlowParams);
+                }
+            }
+            @Override
+            public void onBillingServiceDisconnected() {
+                // Try to restart the connection on the next request to
+                // Google Play by calling the startConnection() method.
+            }
+        });
+    }
+    private PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
+        @Override
+        public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
+            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
+                    && purchases != null) {
+                for (Purchase purchase : purchases) {
+                    handlePurchase(purchase);
+                }
+            } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+                // Handle an error caused by a user cancelling the purchase flow.
+            } else {
+                // Handle any other error codes.
+            }
+        }
+    };
+
+    void handlePurchase(Purchase purchase) {
+        if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+            if (!purchase.isAcknowledged()) {
+                AcknowledgePurchaseParams acknowledgePurchaseParams =
+                        AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.getPurchaseToken())
+                                .build();
+                billingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
+            }
+            SharedPreferences.Editor editor = getSharedPreferences("settings",0).edit();
+            editor.putBoolean("premium", true);
+            editor.apply();
+            Log.d("yeah", "premium");
+        }
+    }
+    AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
+        @Override
+        public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
+
+        }
+    };
 }

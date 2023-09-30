@@ -10,8 +10,8 @@ android {
         applicationId "com.halicon.async"
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 4
+        versionName "1.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,10 +37,11 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.android.billingclient:billing:6.0.1'
+    implementation files('C:/Users/rayyt/OneDrive/Documents/async/app/libs/guava-20.0.jar')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    debugImplementation 'com.example.flutter_module:flutter_debug:1.0'
-    profileImplementation 'com.example.flutter_module:flutter_profile:1.0'
-    releaseImplementation 'com.example.flutter_module:flutter_release:1.0'
+    implementation 'com.github.lincollincol:AudioTool:1.2.1'
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1.LTS'
 }

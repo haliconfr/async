@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ThemeActionBar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#A4C3D2"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity" >
+
+    <ImageView
+        android:id="@+id/moresounds"
+        android:layout_width="192dp"
+        android:layout_height="63dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/more_button"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/setTransition"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.04000002" />
+
+    <ImageView
+        android:id="@+id/backMore"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/arrow"
+        android:scaleX="-1"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/moresounds"
+        app:layout_constraintEnd_toStartOf="@+id/moresounds"
+        app:layout_constraintHorizontal_bias="0.159"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/moresounds" />
+
+    <TextView
+        android:id="@+id/moresoundsText"
+        android:layout_width="126dp"
+        android:layout_height="36dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="buy premium for $1.50"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/moresounds"
+        app:layout_constraintEnd_toEndOf="@+id/moresounds"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="@+id/moresounds"
+        app:layout_constraintTop_toTopOf="@+id/moresounds" />
+
+    <TextView
+        android:id="@+id/setTransition"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#A4C3D2"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/moreTransition"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:alpha="0"
+        android:background="#A4C3D2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

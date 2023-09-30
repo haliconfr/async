@@ -77,6 +77,38 @@
         app:layout_constraintVertical_bias="0.00999999" />
 
     <TextView
+        android:id="@+id/textView2"
+        android:layout_width="94dp"
+        android:layout_height="28dp"
+        android:fontFamily="serif"
+        android:gravity="center|left"
+        android:text="thunder"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/thunderSet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.06"
+        app:layout_constraintStart_toEndOf="@+id/thunderSet"
+        app:layout_constraintTop_toTopOf="@+id/thunderSet" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="94dp"
+        android:layout_height="28dp"
+        android:fontFamily="serif"
+        android:gravity="center|left"
+        android:text="traffic"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/trafficSet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.06"
+        app:layout_constraintStart_toEndOf="@+id/trafficSet"
+        app:layout_constraintTop_toTopOf="@+id/trafficSet" />
+
+    <TextView
         android:id="@+id/sleepText"
         android:layout_width="105dp"
         android:layout_height="36dp"
@@ -94,13 +126,13 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
-        android:id="@+id/moresounds"
+        android:id="@+id/moresoundsTransition"
         android:layout_width="192dp"
         android:layout_height="63dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="@drawable/more_button"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/sleepText"
         app:layout_constraintEnd_toEndOf="@+id/setTransition"
         app:layout_constraintHorizontal_bias="0.497"
@@ -109,7 +141,7 @@
         app:layout_constraintVertical_bias="0.127" />
 
     <TextView
-        android:id="@+id/moresoundsText"
+        android:id="@+id/moresoundsTransText"
         android:layout_width="126dp"
         android:layout_height="36dp"
         android:fontFamily="serif"
@@ -118,12 +150,12 @@
         android:textColor="@color/white"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/moresounds"
-        app:layout_constraintEnd_toEndOf="@+id/moresounds"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/moresoundsTransition"
+        app:layout_constraintEnd_toEndOf="@+id/moresoundsTransition"
         app:layout_constraintHorizontal_bias="0.3"
-        app:layout_constraintStart_toStartOf="@+id/moresounds"
-        app:layout_constraintTop_toTopOf="@+id/moresounds" />
+        app:layout_constraintStart_toStartOf="@+id/moresoundsTransition"
+        app:layout_constraintTop_toTopOf="@+id/moresoundsTransition" />
 
     <TextView
         android:id="@+id/setTransition"
@@ -138,15 +170,15 @@
 
     <ImageView
         android:id="@+id/startSet"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="@drawable/settings"
         app:layout_constraintBottom_toTopOf="@+id/sleepText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/rain1"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 

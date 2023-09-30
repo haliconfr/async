@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.putInt("spinnerSelection", i);
                 editor.apply();
                 animateRain();
-                startAudio();
+                MainVariables.path = getPath();
             }
 
             @Override
@@ -107,11 +108,8 @@ public class MainActivity extends AppCompatActivity {
         int selection = sp.getInt("spinnerSelection", 1);
         spinner.setSelection(selection);
         transitionView.animate().alpha(0.0f).setDuration(1500);
-    }
-
-    void startAudio() {
+        MainVariables.path = "android.resource://com.halicon.async/raw/" + "soft" + "_" + "base";
         Intent intent = new Intent(this, soundService.class);
-        intent.putExtra("path", getPath());
         startService(intent);
     }
 
@@ -137,15 +135,12 @@ public class MainActivity extends AppCompatActivity {
         name = selected.toLowerCase();
         if (windowSelected) {
             mode = "window";
+            MainVariables.window = true;
         } else {
             mode = "base";
+            MainVariables.window = false;
         }
-        String path;
-        if (!Objects.equals(previousItem, name + mode)) {
-            path = "android.resource://com.halicon.async/raw/" + name + "_" + mode;
-        } else {
-            path = "android.resource://com.halicon.async/raw/silence";
-        }
+        String path = "android.resource://com.halicon.async/raw/" + name + "_" + mode;
         return path;
     }
 
@@ -173,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         if (!windowSelected) {
             window.setForeground(ResourcesCompat.getDrawable(getResources(), R.drawable.window_pressed, null));
             windowSelected = true;
-            startAudio();
+            MainVariables.path = getPath();
             Glide.with(MainActivity.this)
                     .load(R.drawable.window)
                     .transition(DrawableTransitionOptions.withCrossFade(500))
@@ -184,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             window.setForeground(ResourcesCompat.getDrawable(getResources(), R.drawable.windowbutton, null));
             windowSelected = false;
-            startAudio();
+            MainVariables.path = getPath();
             Glide.with(MainActivity.this)
                     .load(R.drawable.empty)
                     .transition(DrawableTransitionOptions.withCrossFade(500))
@@ -201,10 +196,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     sleep(MainVariables.timer * 60000L);
-                    Intent intent = new Intent(MainActivity.this, soundService.class);
-                    intent.putExtra("path", "android.resource://com.halicon.async/raw/silence");
-                    startService(intent);
-                    sleep(3000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
