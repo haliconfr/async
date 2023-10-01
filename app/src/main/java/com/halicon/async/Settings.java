@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -30,10 +31,12 @@ import java.util.List;
 public class Settings extends AppCompatActivity {
     Spinner spinner;
     View[] icons = new View[2];
-    ImageView start;
+    View[] moreIcons = new View[3];
+    ImageView start, buyPremium;
     TextView transitionView;
     BillingClient billingClient;
     ProductDetails productDetails;
+    Boolean premium;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +122,8 @@ public class Settings extends AppCompatActivity {
 
             }
         });
+        SharedPreferences sp = getSharedPreferences("settings",0);
+        premium = sp.getBoolean("premium", false);
     }
     void addSound(View view){
         if(!MainVariables.enabled.contains(view.getTag().toString())){
@@ -175,11 +180,25 @@ public class Settings extends AppCompatActivity {
             public void onAnimationStart(@NonNull Animator animator) {
 
             }
-
             @Override
             public void onAnimationEnd(@NonNull Animator animator) {
                 setContentView(R.layout.moresounds);
-                ImageView purchase = findViewById(R.id.moresounds);
+                buyPremium = findViewById(R.id.moresounds);
+                if(premium){
+                    TextView lock = findViewById(R.id.premiumLock);
+                    TextView lockText = findViewById(R.id.lockText);
+                    TextView msText = findViewById(R.id.moresoundsText);
+                    msText.setVisibility(View.GONE);
+                    lock.setVisibility(View.GONE);
+                    lockText.setVisibility(View.GONE);
+                    buyPremium.setVisibility(View.GONE);
+                    moreIcons[0] = findViewById(R.id.streamSet);
+                    moreIcons[1] = findViewById(R.id.cafeSet);
+                    moreIcons[2] = findViewById(R.id.cicadaSet);
+                    for(View v : moreIcons){
+                        setIcon(v);
+                    }
+                }
                 TextView transition = findViewById(R.id.moreTransition);
                 transition.setAlpha(1);
                 transition.animate().alpha(0.0f).setDuration(500);
@@ -193,19 +212,16 @@ public class Settings extends AppCompatActivity {
                             public void onAnimationStart(@NonNull Animator animator) {
 
                             }
-
                             @Override
                             public void onAnimationEnd(@NonNull Animator animator) {
                                 Intent intent = new Intent(Settings.this, Settings.class);
                                 startActivity(intent);
                                 overridePendingTransition(0, 0);
                             }
-
                             @Override
                             public void onAnimationCancel(@NonNull Animator animator) {
 
                             }
-
                             @Override
                             public void onAnimationRepeat(@NonNull Animator animator) {
 
@@ -213,7 +229,7 @@ public class Settings extends AppCompatActivity {
                         });
                     }
                 });
-                purchase.setOnClickListener(new View.OnClickListener() {
+                buyPremium.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         buyPremium();
@@ -221,12 +237,10 @@ public class Settings extends AppCompatActivity {
                 });
                 overridePendingTransition(0, 0);
             }
-
             @Override
             public void onAnimationCancel(@NonNull Animator animator) {
 
             }
-
             @Override
             public void onAnimationRepeat(@NonNull Animator animator) {
 
@@ -305,7 +319,13 @@ public class Settings extends AppCompatActivity {
             SharedPreferences.Editor editor = getSharedPreferences("settings",0).edit();
             editor.putBoolean("premium", true);
             editor.apply();
-            Log.d("yeah", "premium");
+            TextView lock = findViewById(R.id.premiumLock);
+            TextView lockText = findViewById(R.id.lockText);
+            TextView msText = findViewById(R.id.moresoundsText);
+            lock.setVisibility(View.GONE);
+            lockText.setVisibility(View.GONE);
+            buyPremium.setVisibility(View.GONE);
+            msText.setVisibility(View.GONE);
         }
     }
     AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {

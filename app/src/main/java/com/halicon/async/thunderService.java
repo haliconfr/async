@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.Random;
 
 import linc.com.library.AudioTool;
@@ -38,7 +39,7 @@ public class thunderService extends Service {
     public boolean ready;
     File moddedTempFile, uneditTempFile;
     String resprefix = "android.resource://com.halicon.async/raw/";
-    boolean enabled;
+    boolean enabled, checkLoopRunning, readyToEnd;
     Thread thread;
     int duration;
 
@@ -47,15 +48,12 @@ public class thunderService extends Service {
         super.onCreate();
     }
     public int onStartCommand(Intent intent, int flags, int startId) {
-        enabled = intent.getExtras().getBoolean("enabled");
-        sound = intent.getExtras().getString("sound");
-        if(enabled){
-            ready = true;
-            Log.d("yeah", sound + " service started");
-        }else{
-            ready = false;
-            Log.d("yeah", sound + " service stopped");
+        if(!checkLoopRunning){
+            checkLoop();
         }
+        sound = intent.getExtras().getString("sound");
+        ready = true;
+        enabled = true;
         try {
             startAudio();
         } catch (IOException e) {
@@ -63,6 +61,13 @@ public class thunderService extends Service {
         }
         return Service.START_STICKY;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ready = false;
+    }
+
     void startAudio() throws IOException {
         thread = new Thread() {
             @Override
@@ -70,6 +75,7 @@ public class thunderService extends Service {
                 try {
                     while(ready) {
                         if(enabled){
+                            readyToEnd = false;
                             mp = new MediaPlayer();
                             mp.setLooping(false);
                             mp.setVolume(1.0f,1.0f);
@@ -94,7 +100,9 @@ public class thunderService extends Service {
                                     uneditTempFile.delete();
                                 }
                             }
+                            readyToEnd = true;
                             mp.stop();
+                            Log.d("yeah", "sound effect " + path.toString() + " stopped!");
                             sleep(rand.nextInt(80000 - 20000) + 20000);
                         }
                     }
@@ -131,6 +139,7 @@ public class thunderService extends Service {
             }
             return Uri.parse(moddedTempFile.getPath());
         }else{
+            Log.d("yeah", "sound effect " + random + " started!");
             return Uri.parse(resprefix + sound+"_"+random);
         }
     }
@@ -143,7 +152,25 @@ public class thunderService extends Service {
                 outputStream.write(bytes, 0, read);
             }
         }
-
+    }
+    void checkLoop(){
+        checkLoopRunning = true;
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        sleep(1000);
+                        if(!MainVariables.sfxBooleans.get(sound) || MainVariables.disableAllSounds && readyToEnd){
+                            stopService(new Intent(thunderService.this, thunderService.class));
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        thread.start();
     }
     @Nullable
     @Override

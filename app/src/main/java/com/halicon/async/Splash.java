@@ -26,7 +26,6 @@ public class Splash extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences("settings",0);
         MainVariables.enabled = sp.getString("sounds", "thunder ");
         MainVariables.timer = sp.getInt("timer", 0);
-        Log.d("yeah", String.valueOf(sp.getBoolean("init", false)));
         if(sp.getBoolean("init", true)){
             SharedPreferences.Editor editor = getSharedPreferences("settings",0).edit();
             editor.putBoolean("init", false);
@@ -58,7 +57,7 @@ public class Splash extends AppCompatActivity {
         }
     }
     void transition(Class destination){
-        transitionView.animate().alpha(1.0f).setDuration(1500).setListener(new Animator.AnimatorListener() {
+        transitionView.animate().alpha(1.0f).setDuration(500).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(@NonNull Animator animator) {
 

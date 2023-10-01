@@ -10,27 +10,47 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
-public class soundService extends Service {
+import linc.com.library.AudioTool;
+import linc.com.library.callback.OnFileComplete;
+
+public class sfxService extends Service {
     int currentMP, duration;
+    float maximumVolume = 0.5f;
     float mpVolume, mp2Volume;
     MediaPlayer mp, mp2;
-    String path;
+    Uri path;
+    Boolean soundAlreadyWindowed;
+    String soundName;
     public boolean ready;
-    boolean first;
+    String resprefix = "android.resource://com.halicon.async/raw/";
+    boolean first, checkLoopRunning;
 
     @Override
     public void onCreate() {
         super.onCreate();
     }
     public int onStartCommand(Intent intent, int flags, int startId) {
-        path = MainVariables.path;
+        if(!checkLoopRunning){checkLoop();}
+        soundAlreadyWindowed = false;
+        soundName = intent.getExtras().getString("sound");
+        try {
+            path = getFile();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Log.d("sfxService", resprefix + soundName);
+        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+        metaRetriever.setDataSource(sfxService.this, Uri.parse(resprefix + intent.getExtras().getString("sound")));
+        duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
         if (!first) {
             try {
-                startAudio(path);
-                checkLoop();
+                startAudio();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -43,14 +63,14 @@ public class soundService extends Service {
             switch (currentMP) {
                 case 1:
                     try {
-                        startAudio(path);
+                        startAudio();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                     break;
                 case 2:
                     try {
-                        startNewAudio(path);
+                        startNewAudio();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -58,17 +78,14 @@ public class soundService extends Service {
             }
         }
     }
-    void startAudio(String path) throws IOException {
+    void startAudio() throws IOException {
         loop();
         ready = false;
-        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-        metaRetriever.setDataSource(soundService.this, Uri.parse(path));
-        duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
         mp = new MediaPlayer();
         mp.setVolume(0.0f,0.0f);
         mpVolume = 0.0f;
         try {
-            mp.setDataSource(soundService.this, Uri.parse(path));
+            mp.setDataSource(sfxService.this, path);
             mp.prepare();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -85,10 +102,8 @@ public class soundService extends Service {
                 try {
                     while(!ready) {
                         sleep(29);
-                        if(mpVolume < 1){
+                        if(mpVolume < maximumVolume){
                             mpVolume+=0.01f;
-                            Log.d("yeah", "MP1 volume = " + String.valueOf(mpVolume));
-                            Log.d("yeah", "MP2 volume = " + String.valueOf(mp2Volume));
                             if(mp2Volume > 0){
                                 mp2Volume-=0.01f;
                             }
@@ -97,7 +112,6 @@ public class soundService extends Service {
                                 mp2.setVolume(mp2Volume, mp2Volume);
                             }
                         }else{
-                            Log.d("yeah", "stop second");
                             if(mp2 != null){
                                 mp2.stop();
                                 mp2.release();
@@ -113,16 +127,13 @@ public class soundService extends Service {
         };
         thread.start();
     }
-    void startNewAudio(String path) throws IOException {
+    void startNewAudio() throws IOException {
         ready = false;
-        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-        metaRetriever.setDataSource(soundService.this, Uri.parse(path));
-        duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
         mp2 = new MediaPlayer();
         mp2.setVolume(0.0f,0.0f);
         mp2Volume = 0.0f;
         try {
-            mp2.setDataSource(soundService.this, Uri.parse(path));
+            mp2.setDataSource(sfxService.this, path);
             mp2.prepare();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -139,15 +150,12 @@ public class soundService extends Service {
                 try {
                     while(!ready) {
                         sleep(29);
-                        if(mp2Volume < 1){
+                        if(mp2Volume < maximumVolume){
                             mpVolume-=0.01f;
                             mp2Volume+=0.01f;
-                            Log.d("yeah", "MP1 volume = " + String.valueOf(mpVolume));
-                            Log.d("yeah", "MP2 volume = " + String.valueOf(mp2Volume));
                             mp.setVolume(mpVolume, mpVolume);
                             mp2.setVolume(mp2Volume, mp2Volume);
                         }else{
-                            Log.d("yeah", "stop main");
                             mp.stop();
                             mp.release();
                             currentMP = 1;
@@ -156,29 +164,6 @@ public class soundService extends Service {
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
-            }
-        };
-        thread.start();
-    }
-    void checkLoop(){
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        String oldPath = path;
-                        sleep(1000);
-                        if (!Objects.equals(MainVariables.path, oldPath)) {
-                            while(!ready){
-                                sleep(500);
-                            }
-                            path = MainVariables.path;
-                            switchMPs();
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
             }
         };
@@ -194,8 +179,44 @@ public class soundService extends Service {
                         while(!ready){
                             sleep(500);
                         }
-                        if(!path.contains("silence")){
+                        switchMPs();
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        thread.start();
+    }
+    Uri getFile() throws IOException, InterruptedException {
+        return Uri.parse(resprefix + soundName);
+    }
+    void checkLoop(){
+        checkLoopRunning = true;
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        sleep(1000);
+                        if(!MainVariables.sfxBooleans.get(soundName) || MainVariables.disableAllSounds){
+                            path = Uri.parse("android.resource://com.halicon.async/raw/silence");
                             switchMPs();
+                            //sleep(4500);
+                            stopService(new Intent(sfxService.this, sfxService.class));
+                        }
+                        if(MainVariables.window){
+                            if(!soundAlreadyWindowed){
+                                maximumVolume = maximumVolume - 0.2f;
+                                soundAlreadyWindowed = true;
+                                switchMPs();
+                            }
+                        }else{
+                            if(soundAlreadyWindowed){
+                                maximumVolume = 0.5f;
+                                soundAlreadyWindowed = false;
+                                switchMPs();
+                            }
                         }
                     }
                 } catch (InterruptedException e) {

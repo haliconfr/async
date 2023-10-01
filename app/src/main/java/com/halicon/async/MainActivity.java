@@ -38,13 +38,14 @@ public class MainActivity extends AppCompatActivity {
     String mode, name, selected, previousItem;
     ImageView rain1, settings;
     TextView transitionView;
-    boolean windowSelected;
+    boolean windowSelected, premium, first;
     int previousItemIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MainVariables.disableAllSounds = false;
         settings = findViewById(R.id.settings);
         if(MainVariables.timer != 0){
             timer();
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MainVariables.disableAllSounds = true;
                 settings.setClickable(false);
                 transition(Settings.class);
             }
@@ -80,7 +82,15 @@ public class MainActivity extends AppCompatActivity {
                 enableWindow();
             }
         });
-        String[] array_spinner = new String[2];
+        SharedPreferences sp = getSharedPreferences("settings",0);
+        premium = sp.getBoolean("premium", false);
+        String[] array_spinner;
+        if(premium){
+            array_spinner = new String[3];
+            array_spinner[2] = "Off";
+        }else{
+            array_spinner = new String[2];
+        }
         array_spinner[0] = "Heavy";
         array_spinner[1] = "Soft";
         ArrayAdapter<String> adapter =
@@ -97,6 +107,11 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
                 animateRain();
                 MainVariables.path = getPath();
+                if(!first){
+                    Intent intent = new Intent(MainActivity.this, soundService.class);
+                    startService(intent);
+                    first = true;
+                }
             }
 
             @Override
@@ -104,31 +119,44 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        SharedPreferences sp = getSharedPreferences("settings",0);
         int selection = sp.getInt("spinnerSelection", 1);
         spinner.setSelection(selection);
-        transitionView.animate().alpha(0.0f).setDuration(1500);
-        MainVariables.path = "android.resource://com.halicon.async/raw/" + "soft" + "_" + "base";
-        Intent intent = new Intent(this, soundService.class);
-        startService(intent);
+        transitionView.animate().alpha(0.0f).setDuration(500);
     }
 
     void startSFX(Button button, String sound) {
-        Intent fxIntent = new Intent(this, thunderService.class);
-        if (fxEnabled[Arrays.asList(sounds).indexOf(button)]) {
-            button.setForeground(getResources().getDrawable(getResources()
-                    .getIdentifier(sound, "drawable", getPackageName())));
-            fxIntent.putExtra("enabled", false);
-            fxIntent.putExtra("sound", sound);
-            fxEnabled[Arrays.asList(sounds).indexOf(button)] = false;
-        } else {
-            button.setForeground(getResources().getDrawable(getResources()
-                    .getIdentifier(sound + "_pressed", "drawable", getPackageName())));
-            fxIntent.putExtra("enabled", true);
-            fxIntent.putExtra("sound", sound);
-            fxEnabled[Arrays.asList(sounds).indexOf(button)] = true;
+        Intent fxIntent;
+        if(!sound.contains("prem")){
+            fxIntent = new Intent(this, thunderService.class);
+            if (fxEnabled[Arrays.asList(sounds).indexOf(button)]) {
+                button.setForeground(getResources().getDrawable(getResources()
+                        .getIdentifier(sound, "drawable", getPackageName())));
+                MainVariables.sfxBooleans.put(sound, false);
+                fxEnabled[Arrays.asList(sounds).indexOf(button)] = false;
+            } else {
+                button.setForeground(getResources().getDrawable(getResources()
+                        .getIdentifier(sound + "_pressed", "drawable", getPackageName())));
+                MainVariables.sfxBooleans.put(sound, true);
+                fxIntent.putExtra("sound", sound);
+                fxEnabled[Arrays.asList(sounds).indexOf(button)] = true;
+                startService(fxIntent);
+            }
+        }else{
+            fxIntent = new Intent(this, sfxService.class);
+            if (fxEnabled[Arrays.asList(sounds).indexOf(button)]) {
+                button.setForeground(getResources().getDrawable(getResources()
+                        .getIdentifier(sound, "drawable", getPackageName())));
+                MainVariables.sfxBooleans.put(sound, false);
+                fxEnabled[Arrays.asList(sounds).indexOf(button)] = false;
+            } else {
+                button.setForeground(getResources().getDrawable(getResources()
+                        .getIdentifier(sound + "_pressed", "drawable", getPackageName())));
+                MainVariables.sfxBooleans.put(sound, true);
+                fxIntent.putExtra("sound", sound);
+                fxEnabled[Arrays.asList(sounds).indexOf(button)] = true;
+                startService(fxIntent);
+            }
         }
-        startService(fxIntent);
     }
 
     String getPath() {
@@ -141,11 +169,21 @@ public class MainActivity extends AppCompatActivity {
             MainVariables.window = false;
         }
         String path = "android.resource://com.halicon.async/raw/" + name + "_" + mode;
+        if(Objects.equals(selected, "Off")){
+            path = "android.resource://com.halicon.async/raw/silence";
+            Glide.with(MainActivity.this)
+                    .load(R.drawable.empty)
+                    .transition(DrawableTransitionOptions.withCrossFade(4000))
+                    .apply(new RequestOptions().override(1080, 1920)
+                            .error(R.drawable.icon).centerCrop()
+                    )
+                    .into(rain1);
+        }
         return path;
     }
 
     void animateRain() {
-        if (selected.toLowerCase().equals("heavy")) {
+        if (selected.equalsIgnoreCase("heavy")) {
             Glide.with(MainActivity.this)
                     .load(R.drawable.heavy_rain)
                     .transition(DrawableTransitionOptions.withCrossFade(4000))
@@ -234,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAnimationEnd(@NonNull Animator animator) {
                 settings.setClickable(true);
+                MainVariables.window = false;
                 Intent intent = new Intent(MainActivity.this, destination);
                 startActivity(intent);
                 overridePendingTransition(0, 0);
