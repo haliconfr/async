@@ -59,11 +59,12 @@ public class soundService extends Service {
         }
     }
     void startAudio(String path) throws IOException {
-        loop();
         ready = false;
+        duration = 0;
         MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
         metaRetriever.setDataSource(soundService.this, Uri.parse(path));
         duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+        loop();
         mp = new MediaPlayer();
         mp.setVolume(0.0f,0.0f);
         mpVolume = 0.0f;
@@ -87,8 +88,6 @@ public class soundService extends Service {
                         sleep(29);
                         if(mpVolume < 1){
                             mpVolume+=0.01f;
-                            Log.d("yeah", "MP1 volume = " + String.valueOf(mpVolume));
-                            Log.d("yeah", "MP2 volume = " + String.valueOf(mp2Volume));
                             if(mp2Volume > 0){
                                 mp2Volume-=0.01f;
                             }
@@ -97,7 +96,6 @@ public class soundService extends Service {
                                 mp2.setVolume(mp2Volume, mp2Volume);
                             }
                         }else{
-                            Log.d("yeah", "stop second");
                             if(mp2 != null){
                                 mp2.stop();
                                 mp2.release();
@@ -142,12 +140,9 @@ public class soundService extends Service {
                         if(mp2Volume < 1){
                             mpVolume-=0.01f;
                             mp2Volume+=0.01f;
-                            Log.d("yeah", "MP1 volume = " + String.valueOf(mpVolume));
-                            Log.d("yeah", "MP2 volume = " + String.valueOf(mp2Volume));
                             mp.setVolume(mpVolume, mpVolume);
                             mp2.setVolume(mp2Volume, mp2Volume);
                         }else{
-                            Log.d("yeah", "stop main");
                             mp.stop();
                             mp.release();
                             currentMP = 1;
@@ -190,7 +185,7 @@ public class soundService extends Service {
             public void run() {
                 try {
                     while (true) {
-                        sleep(duration - duration/20);
+                        sleep(duration - 5000);
                         while(!ready){
                             sleep(500);
                         }

@@ -24,7 +24,7 @@
         app:layout_constraintHorizontal_bias="0.045"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.029999971" />
+        app:layout_constraintVertical_bias="0.050000012" />
 
     <Button
         android:id="@+id/trafficSet"
@@ -35,11 +35,11 @@
         android:focusable="true"
         android:foreground="@drawable/traffic"
         android:tag="traffic"
-        app:layout_constraintBottom_toTopOf="@+id/timer"
+        app:layout_constraintBottom_toBottomOf="@+id/thunderSet"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.045"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/thunderSet"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toEndOf="@+id/thunderSet"
+        app:layout_constraintTop_toTopOf="@+id/thunderSet"
         app:layout_constraintVertical_bias="0.050000012" />
 
     <Spinner
@@ -66,7 +66,7 @@
         android:contentDescription="@string/title_desc"
         android:fontFamily="serif"
         android:gravity="center"
-        android:text="@string/settings"
+        android:text="edit menu"
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -76,37 +76,153 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.00999999" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="94dp"
-        android:layout_height="28dp"
-        android:fontFamily="serif"
-        android:gravity="center|left"
-        android:text="thunder"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/thunderSet"
+    <Button
+        android:id="@+id/cicadaSet"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:clickable="true"
+        android:contentDescription="@string/thunder_desc"
+        android:focusable="true"
+        android:foreground="@drawable/premcicadas"
+        android:tag="premcicadas"
+        app:layout_constraintBottom_toBottomOf="@+id/streamSet"
+        app:layout_constraintEnd_toEndOf="@+id/trafficSet"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/trafficSet"
+        app:layout_constraintTop_toBottomOf="@+id/trafficSet"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/cafeSet"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:clickable="true"
+        android:contentDescription="@string/thunder_desc"
+        android:focusable="true"
+        android:foreground="@drawable/premcafe"
+        android:tag="premcafe"
+        app:layout_constraintBottom_toBottomOf="@+id/cicadaSet"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.06"
-        app:layout_constraintStart_toEndOf="@+id/thunderSet"
-        app:layout_constraintTop_toTopOf="@+id/thunderSet" />
+        app:layout_constraintHorizontal_bias="0.13"
+        app:layout_constraintStart_toEndOf="@+id/cicadaSet"
+        app:layout_constraintTop_toBottomOf="@+id/trafficSet"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/streamSet"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:clickable="true"
+        android:contentDescription="@string/thunder_desc"
+        android:focusable="true"
+        android:foreground="@drawable/premstream"
+        android:tag="premstream"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/thunderText"
+        app:layout_constraintVertical_bias="0.04000002" />
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="94dp"
-        android:layout_height="28dp"
+        android:id="@+id/thunderText"
+        android:layout_width="79dp"
+        android:layout_height="21dp"
         android:fontFamily="serif"
-        android:gravity="center|left"
+        android:gravity="center"
+        android:text="thunder"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/thunderSet"
+        app:layout_constraintStart_toStartOf="@+id/thunderSet"
+        app:layout_constraintTop_toBottomOf="@+id/thunderSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/trafficText"
+        android:layout_width="79dp"
+        android:layout_height="21dp"
+        android:fontFamily="serif"
+        android:gravity="center"
         android:text="traffic"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/trafficSet"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/trafficSet"
+        app:layout_constraintStart_toStartOf="@+id/trafficSet"
+        app:layout_constraintTop_toBottomOf="@+id/trafficSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/cafeText"
+        android:layout_width="79dp"
+        android:layout_height="21dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="cafe"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/sleepText"
+        app:layout_constraintEnd_toEndOf="@+id/cafeSet"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="@+id/cafeSet"
+        app:layout_constraintTop_toBottomOf="@+id/cafeSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/streamText"
+        android:layout_width="79dp"
+        android:layout_height="21dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="stream"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/sleepText"
+        app:layout_constraintEnd_toEndOf="@+id/streamSet"
+        app:layout_constraintStart_toStartOf="@+id/streamSet"
+        app:layout_constraintTop_toBottomOf="@+id/streamSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/cicadasText"
+        android:layout_width="79dp"
+        android:layout_height="21dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="cicadas"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/sleepText"
+        app:layout_constraintEnd_toEndOf="@+id/cicadaSet"
+        app:layout_constraintStart_toStartOf="@+id/cicadaSet"
+        app:layout_constraintTop_toBottomOf="@+id/streamSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/premiumLock"
+        android:layout_width="415dp"
+        android:layout_height="434dp"
+        android:focusable="true"
+        android:foreground="@drawable/icon"
+        android:foregroundTint="#3C000000"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/sleepText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.06"
-        app:layout_constraintStart_toEndOf="@+id/trafficSet"
-        app:layout_constraintTop_toTopOf="@+id/trafficSet" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trafficText"
+        app:layout_constraintVertical_bias="0.49" />
 
     <TextView
         android:id="@+id/sleepText"
@@ -124,38 +240,6 @@
         app:layout_constraintStart_toStartOf="@+id/timer"
         app:layout_constraintTop_toBottomOf="@+id/trafficSet"
         app:layout_constraintVertical_bias="1.0" />
-
-    <ImageView
-        android:id="@+id/moresoundsTransition"
-        android:layout_width="192dp"
-        android:layout_height="63dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="@drawable/more_button"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/sleepText"
-        app:layout_constraintEnd_toEndOf="@+id/setTransition"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/trafficSet"
-        app:layout_constraintVertical_bias="0.127" />
-
-    <TextView
-        android:id="@+id/moresoundsTransText"
-        android:layout_width="126dp"
-        android:layout_height="36dp"
-        android:fontFamily="serif"
-        android:gravity="center"
-        android:text="more sounds"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/moresoundsTransition"
-        app:layout_constraintEnd_toEndOf="@+id/moresoundsTransition"
-        app:layout_constraintHorizontal_bias="0.3"
-        app:layout_constraintStart_toStartOf="@+id/moresoundsTransition"
-        app:layout_constraintTop_toTopOf="@+id/moresoundsTransition" />
 
     <TextView
         android:id="@+id/setTransition"
@@ -181,5 +265,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/tick"
+        android:layout_width="37dp"
+        android:layout_height="35dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/tick"
+        app:layout_constraintBottom_toBottomOf="@+id/thunderSet"
+        app:layout_constraintEnd_toEndOf="@+id/thunderSet"
+        app:layout_constraintStart_toStartOf="@+id/thunderSet"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.083" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

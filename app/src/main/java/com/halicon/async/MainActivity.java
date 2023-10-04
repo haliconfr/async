@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     Spinner spinner;
     Button window;
     Button[] sounds = new Button[5];
-    Boolean[] fxEnabled = new Boolean[5];
     ImageView windowSheet;
     String mode, name, selected, previousItem;
     ImageView rain1, settings;
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(getIntent().getBooleanExtra("init", false)){
             settings.setAlpha(0.0f);
-            settings.animate().alpha(1.0f).setDuration(2000);
+            settings.animate().alpha(1.0f).setDuration(500);
         }
         selected = " ";
         transitionView = findViewById(R.id.transition2);
@@ -128,32 +127,28 @@ public class MainActivity extends AppCompatActivity {
         Intent fxIntent;
         if(!sound.contains("prem")){
             fxIntent = new Intent(this, thunderService.class);
-            if (fxEnabled[Arrays.asList(sounds).indexOf(button)]) {
+            if (MainVariables.sfxBooleans.get(sound)) {
                 button.setForeground(getResources().getDrawable(getResources()
                         .getIdentifier(sound, "drawable", getPackageName())));
                 MainVariables.sfxBooleans.put(sound, false);
-                fxEnabled[Arrays.asList(sounds).indexOf(button)] = false;
             } else {
                 button.setForeground(getResources().getDrawable(getResources()
                         .getIdentifier(sound + "_pressed", "drawable", getPackageName())));
                 MainVariables.sfxBooleans.put(sound, true);
                 fxIntent.putExtra("sound", sound);
-                fxEnabled[Arrays.asList(sounds).indexOf(button)] = true;
                 startService(fxIntent);
             }
         }else{
             fxIntent = new Intent(this, sfxService.class);
-            if (fxEnabled[Arrays.asList(sounds).indexOf(button)]) {
+            if (MainVariables.sfxBooleans.get(sound)) {
                 button.setForeground(getResources().getDrawable(getResources()
                         .getIdentifier(sound, "drawable", getPackageName())));
                 MainVariables.sfxBooleans.put(sound, false);
-                fxEnabled[Arrays.asList(sounds).indexOf(button)] = false;
             } else {
                 button.setForeground(getResources().getDrawable(getResources()
                         .getIdentifier(sound + "_pressed", "drawable", getPackageName())));
                 MainVariables.sfxBooleans.put(sound, true);
                 fxIntent.putExtra("sound", sound);
-                fxEnabled[Arrays.asList(sounds).indexOf(button)] = true;
                 startService(fxIntent);
             }
         }
@@ -252,13 +247,13 @@ public class MainActivity extends AppCompatActivity {
                 sounds[i].setVisibility(View.VISIBLE);
                 sounds[i].setForeground(getResources().getDrawable(getResources()
                         .getIdentifier(name, "drawable", getPackageName())));
-                fxEnabled[i] = false;
                 sounds[i].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         startSFX((Button) view, name);
                     }
                 });
+                MainVariables.sfxBooleans.put(name, false);
             }
         }
     }

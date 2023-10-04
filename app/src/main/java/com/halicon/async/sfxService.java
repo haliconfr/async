@@ -197,13 +197,17 @@ public class sfxService extends Service {
             @Override
             public void run() {
                 try {
-                    while (true) {
+                    while (checkLoopRunning) {
+                        Log.d("yeah", "checking...");
                         sleep(1000);
                         if(!MainVariables.sfxBooleans.get(soundName) || MainVariables.disableAllSounds){
+                            Log.d("yeah", "stop!!!");
                             path = Uri.parse("android.resource://com.halicon.async/raw/silence");
                             switchMPs();
-                            //sleep(4500);
                             stopService(new Intent(sfxService.this, sfxService.class));
+                            if(!mp.isPlaying() && !mp2.isPlaying() && mp!=null && mp2!=null){
+                                checkLoopRunning = false;
+                            }
                         }
                         if(MainVariables.window){
                             if(!soundAlreadyWindowed){

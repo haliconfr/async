@@ -36,12 +36,11 @@ public class thunderService extends Service {
     Random rand = new Random();
     String sound;
     MediaPlayer mp;
-    public boolean ready;
     File moddedTempFile, uneditTempFile;
     String resprefix = "android.resource://com.halicon.async/raw/";
-    boolean enabled, checkLoopRunning, readyToEnd;
-    Thread thread;
-    int duration;
+    boolean ready, checkLoopRunning;
+    Thread thread, soundEffectLooper, stopMain;
+    int duration = 0, waitInt = 0;
 
     @Override
     public void onCreate() {
@@ -52,8 +51,6 @@ public class thunderService extends Service {
             checkLoop();
         }
         sound = intent.getExtras().getString("sound");
-        ready = true;
-        enabled = true;
         try {
             startAudio();
         } catch (IOException e) {
@@ -64,8 +61,8 @@ public class thunderService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         ready = false;
+        super.onDestroy();
     }
 
     void startAudio() throws IOException {
@@ -73,45 +70,69 @@ public class thunderService extends Service {
             @Override
             public void run() {
                 try {
-                    while(ready) {
-                        if(enabled){
-                            readyToEnd = false;
-                            mp = new MediaPlayer();
-                            mp.setLooping(false);
-                            mp.setVolume(1.0f,1.0f);
-                            Uri path = getFile();
-                            mp.setDataSource(thunderService.this, path);
-                            MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-                            metaRetriever.setDataSource(thunderService.this, path);
-                            duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-                            mp.prepare();
-                            mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                @Override
-                                public void onPrepared(MediaPlayer mediaPlayer) {
-                                    mp.start();
-                                }
-                            });
-                            sleep(duration + 1000);
-                            if(MainVariables.window){
-                                if(moddedTempFile != null && moddedTempFile.exists()){
-                                    moddedTempFile.delete();
-                                }
-                                if(uneditTempFile != null && uneditTempFile.exists()){
-                                    uneditTempFile.delete();
-                                }
-                            }
-                            readyToEnd = true;
-                            mp.stop();
-                            Log.d("yeah", "sound effect " + path.toString() + " stopped!");
-                            sleep(rand.nextInt(80000 - 20000) + 20000);
+                    mp = new MediaPlayer();
+                    mp.setLooping(false);
+                    mp.setVolume(1.0f,1.0f);
+                    Uri path = getFile();
+                    mp.setDataSource(thunderService.this, path);
+                    MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+                    metaRetriever.setDataSource(thunderService.this, path);
+                    duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+                    mp.prepare();
+                    mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mediaPlayer) {
+                            mp.start();
+                            Log.d("yeah", "sound effect started!");
                         }
-                    }
-                } catch (IOException | InterruptedException e) {
+                    });
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         };
         thread.start();
+        soundEffectLooper = new Thread(){
+            @Override
+            public void run(){
+                try {
+                    while(duration == 0){
+                        sleep(100);
+                    }
+                    sleep(duration + 100);
+                    if(!ready){
+                        soundEffectLooper.interrupt();
+                    }
+                    mp.stop();
+                    mp.release();
+                    if (MainVariables.window) {
+                        if (moddedTempFile != null && moddedTempFile.exists()) {
+                            moddedTempFile.delete();
+                        }
+                        if (uneditTempFile != null && uneditTempFile.exists()) {
+                            uneditTempFile.delete();
+                        }
+                    }
+                    int random = rand.nextInt(600 - 100) + 100;
+                    waitInt = 0;
+                    while (waitInt < random && ready) {
+                        sleep(100);
+                        if(!ready){
+                            soundEffectLooper.interrupt();
+                        }
+                        waitInt++;
+                        Log.d("yeah", String.valueOf(waitInt));
+                    }
+                    if(ready){
+                        thread.run();
+                        soundEffectLooper.run();
+                    }
+                }catch(InterruptedException e){
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        soundEffectLooper.start();
     }
     Uri getFile() throws IOException{
         int random = rand.nextInt(7 - 1) + 1;
@@ -139,7 +160,6 @@ public class thunderService extends Service {
             }
             return Uri.parse(moddedTempFile.getPath());
         }else{
-            Log.d("yeah", "sound effect " + random + " started!");
             return Uri.parse(resprefix + sound+"_"+random);
         }
     }
@@ -154,15 +174,19 @@ public class thunderService extends Service {
         }
     }
     void checkLoop(){
+
         checkLoopRunning = true;
-        Thread thread = new Thread() {
+        Thread loop = new Thread() {
             @Override
             public void run() {
                 try {
                     while (true) {
                         sleep(1000);
-                        if(!MainVariables.sfxBooleans.get(sound) || MainVariables.disableAllSounds && readyToEnd){
-                            stopService(new Intent(thunderService.this, thunderService.class));
+                        if(!MainVariables.sfxBooleans.get(sound) || MainVariables.disableAllSounds){
+                            ready = false;
+                            stopSelf();
+                        }else{
+                            ready = true;
                         }
                     }
                 } catch (InterruptedException e) {
@@ -170,7 +194,7 @@ public class thunderService extends Service {
                 }
             }
         };
-        thread.start();
+        loop.start();
     }
     @Nullable
     @Override
