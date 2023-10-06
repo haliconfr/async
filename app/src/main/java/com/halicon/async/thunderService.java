@@ -2,67 +2,38 @@ package com.halicon.async;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.FileUtils;
 import android.os.IBinder;
-import android.util.Log;
-
 import androidx.annotation.Nullable;
-
-import com.google.common.io.ByteStreams;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-
 import linc.com.library.AudioTool;
 import linc.com.library.callback.OnFileComplete;
 
 public class thunderService extends Service {
     Random rand = new Random();
+    Boolean first = true;
     String sound;
     MediaPlayer mp;
     File moddedTempFile, uneditTempFile;
     String resprefix = "android.resource://com.halicon.async/raw/";
-    boolean ready, checkLoopRunning;
-    Thread thread, soundEffectLooper, stopMain;
-    int duration = 0, waitInt = 0;
+    Thread thread;
+    int duration = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
     }
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(!checkLoopRunning){
-            checkLoop();
-        }
-        sound = intent.getExtras().getString("sound");
-        try {
-            startAudio();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        checkLoop();
         return Service.START_STICKY;
-    }
-
-    @Override
-    public void onDestroy() {
-        ready = false;
-        super.onDestroy();
     }
 
     void startAudio() throws IOException {
@@ -70,73 +41,54 @@ public class thunderService extends Service {
             @Override
             public void run() {
                 try {
-                    mp = new MediaPlayer();
-                    mp.setLooping(false);
-                    mp.setVolume(1.0f,1.0f);
-                    Uri path = getFile();
-                    mp.setDataSource(thunderService.this, path);
-                    MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-                    metaRetriever.setDataSource(thunderService.this, path);
-                    duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-                    mp.prepare();
-                    mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mediaPlayer) {
-                            mp.start();
-                            Log.d("yeah", "sound effect started!");
+                    while(true){
+                        if(sound != null){
+                            duration = 0;
+                            mp = new MediaPlayer();
+                            mp.setLooping(false);
+                            mp.setVolume(1.0f,1.0f);
+                            Uri path = getFile();
+                            mp.setDataSource(thunderService.this, path);
+                            MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+                            metaRetriever.setDataSource(thunderService.this, path);
+                            duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+                            mp.prepare();
+                            mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                @Override
+                                public void onPrepared(MediaPlayer mediaPlayer) {
+                                    mp.start();
+                                }
+                            });
+                            sleep(duration + 500);
+                            try{
+                                if(mp!=null&&!mp.isPlaying()){
+                                    mp.stop();
+                                    mp.release();
+                                }
+                            }catch(IllegalStateException ignored){
+                            }
+                            if (MainVariables.window) {
+                                if (moddedTempFile != null && moddedTempFile.exists()) {
+                                    moddedTempFile.delete();
+                                }
+                                if (uneditTempFile != null && uneditTempFile.exists()) {
+                                    uneditTempFile.delete();
+                                }
+                            }
+                            int random = rand.nextInt(80000 - 1000) + 1000;
+                            sleep(random);
                         }
-                    });
-                } catch (IOException e) {
+                    }
+                } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
         };
         thread.start();
-        soundEffectLooper = new Thread(){
-            @Override
-            public void run(){
-                try {
-                    while(duration == 0){
-                        sleep(100);
-                    }
-                    sleep(duration + 100);
-                    if(!ready){
-                        soundEffectLooper.interrupt();
-                    }
-                    mp.stop();
-                    mp.release();
-                    if (MainVariables.window) {
-                        if (moddedTempFile != null && moddedTempFile.exists()) {
-                            moddedTempFile.delete();
-                        }
-                        if (uneditTempFile != null && uneditTempFile.exists()) {
-                            uneditTempFile.delete();
-                        }
-                    }
-                    int random = rand.nextInt(600 - 100) + 100;
-                    waitInt = 0;
-                    while (waitInt < random && ready) {
-                        sleep(100);
-                        if(!ready){
-                            soundEffectLooper.interrupt();
-                        }
-                        waitInt++;
-                        Log.d("yeah", String.valueOf(waitInt));
-                    }
-                    if(ready){
-                        thread.run();
-                        soundEffectLooper.run();
-                    }
-                }catch(InterruptedException e){
-                    throw new RuntimeException(e);
-                }
-            }
-        };
-        soundEffectLooper.start();
     }
     Uri getFile() throws IOException{
         int random = rand.nextInt(7 - 1) + 1;
-        if(MainVariables.window){
+        if(MainVariables.window && !Objects.equals(sound, "silence")){
             File outputDir = getApplicationContext().getCacheDir();
             InputStream ins = getResources().openRawResource(
                     getResources().getIdentifier(sound+"_"+random,
@@ -160,7 +112,11 @@ public class thunderService extends Service {
             }
             return Uri.parse(moddedTempFile.getPath());
         }else{
-            return Uri.parse(resprefix + sound+"_"+random);
+            if(!Objects.equals(sound, "silence")){
+                return Uri.parse(resprefix + sound+"_"+random);
+            }else{
+                return Uri.parse(resprefix + sound);
+            }
         }
     }
     private static void copyInputStreamToFile(InputStream inputStream, File file)
@@ -174,27 +130,32 @@ public class thunderService extends Service {
         }
     }
     void checkLoop(){
-
-        checkLoopRunning = true;
         Thread loop = new Thread() {
             @Override
             public void run() {
                 try {
                     while (true) {
                         sleep(1000);
-                        if(!MainVariables.sfxBooleans.get(sound) || MainVariables.disableAllSounds){
-                            ready = false;
-                            stopSelf();
-                        }else{
-                            ready = true;
+                        sound = getKeyForTrueValue(MainVariables.thundBooleans);
+                        if(!Objects.equals(sound, "silence") && first){
+                            startAudio();
+                            first = false;
                         }
                     }
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         };
         loop.start();
+    }
+    public static String getKeyForTrueValue(Map<String, Boolean> map) {
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return entry.getKey();
+            }
+        }
+        return "silence";
     }
     @Nullable
     @Override

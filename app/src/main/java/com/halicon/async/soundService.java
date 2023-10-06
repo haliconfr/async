@@ -185,7 +185,7 @@ public class soundService extends Service {
             public void run() {
                 try {
                     while (true) {
-                        sleep(duration - 5000);
+                        sleep(duration - 10000);
                         while(!ready){
                             sleep(500);
                         }

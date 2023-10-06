@@ -48,6 +48,7 @@ public class Settings extends AppCompatActivity {
                 .build();
         setContentView(R.layout.settings);
         indicator = findViewById(R.id.tick);
+        indicator.setAlpha(0.0f);
         start = findViewById(R.id.startSet);
         start.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Objects;
 
 import linc.com.library.AudioTool;
@@ -24,40 +25,22 @@ public class sfxService extends Service {
     float maximumVolume = 0.5f;
     float mpVolume, mp2Volume;
     MediaPlayer mp, mp2;
-    Uri path;
-    Boolean soundAlreadyWindowed;
+    Boolean soundAlreadyWindowed = false;
     String soundName;
-    public boolean ready;
+    public boolean ready, loop, first = true, first2 = false, stoplooping;
     String resprefix = "android.resource://com.halicon.async/raw/";
-    boolean first, checkLoopRunning;
+    boolean checkLoopRunning;
 
     @Override
     public void onCreate() {
         super.onCreate();
     }
+
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(!checkLoopRunning){checkLoop();}
-        soundAlreadyWindowed = false;
-        soundName = intent.getExtras().getString("sound");
-        try {
-            path = getFile();
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        Log.d("sfxService", resprefix + soundName);
-        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-        metaRetriever.setDataSource(sfxService.this, Uri.parse(resprefix + intent.getExtras().getString("sound")));
-        duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-        if (!first) {
-            try {
-                startAudio();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            first = true;
-        }
+        checkLoop();
         return Service.START_STICKY;
     }
+
     void switchMPs(){
         if(ready) {
             switch (currentMP) {
@@ -79,21 +62,20 @@ public class sfxService extends Service {
         }
     }
     void startAudio() throws IOException {
-        loop();
         ready = false;
+        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+        metaRetriever.setDataSource(sfxService.this, Uri.parse(resprefix + soundName));
+        duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
         mp = new MediaPlayer();
         mp.setVolume(0.0f,0.0f);
         mpVolume = 0.0f;
-        try {
-            mp.setDataSource(sfxService.this, path);
-            mp.prepare();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mp.setDataSource(sfxService.this, Uri.parse(resprefix + soundName));
+        mp.prepare();
         mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
-                mp.start();
+                mediaPlayer.start();
+                loop();
             }
         });
         Thread thread = new Thread() {
@@ -129,19 +111,19 @@ public class sfxService extends Service {
     }
     void startNewAudio() throws IOException {
         ready = false;
+        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+        metaRetriever.setDataSource(sfxService.this, Uri.parse(resprefix + soundName));
+        duration = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
         mp2 = new MediaPlayer();
         mp2.setVolume(0.0f,0.0f);
         mp2Volume = 0.0f;
-        try {
-            mp2.setDataSource(sfxService.this, path);
-            mp2.prepare();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mp2.setDataSource(sfxService.this, Uri.parse(resprefix + soundName));
+        mp2.prepare();
         mp2.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
-                mp2.start();
+                mediaPlayer.start();
+                loop();
             }
         });
         Thread thread = new Thread() {
@@ -170,16 +152,26 @@ public class sfxService extends Service {
         thread.start();
     }
     void loop(){
+        stoplooping = false;
+        loop = true;
         Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
-                    while (true) {
-                        sleep(duration - duration/20);
-                        while(!ready){
-                            sleep(500);
+                    while (loop) {
+                        int sleepfor = 0;
+                        int target = duration - 5000;
+                        while(sleepfor < target){
+                            sleep(100);
+                            sleepfor = sleepfor + 100;
+                            if(stoplooping && ready){
+                                sleepfor = target;
+                            }
+                            Log.d("yeah", String.valueOf(sleepfor));
+                            Log.d("yeah", String.valueOf(target));
                         }
                         switchMPs();
+                        loop = false;
                     }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
@@ -187,9 +179,6 @@ public class sfxService extends Service {
             }
         };
         thread.start();
-    }
-    Uri getFile() throws IOException, InterruptedException {
-        return Uri.parse(resprefix + soundName);
     }
     void checkLoop(){
         checkLoopRunning = true;
@@ -198,37 +187,52 @@ public class sfxService extends Service {
             public void run() {
                 try {
                     while (checkLoopRunning) {
-                        Log.d("yeah", "checking...");
-                        sleep(1000);
-                        if(!MainVariables.sfxBooleans.get(soundName) || MainVariables.disableAllSounds){
-                            Log.d("yeah", "stop!!!");
-                            path = Uri.parse("android.resource://com.halicon.async/raw/silence");
-                            switchMPs();
-                            stopService(new Intent(sfxService.this, sfxService.class));
-                            if(!mp.isPlaying() && !mp2.isPlaying() && mp!=null && mp2!=null){
-                                checkLoopRunning = false;
+                        String path = getKeyForTrueValue(MainVariables.sfxBooleans);
+                        if(soundName == null || !soundName.equals(path)){
+                            soundName = path;
+                            if(first2){
+                                startAudio();
+                                first2 = false;
+                            }
+                            if(first){
+                                first = false;
+                                first2 = true;
+                            }else{
+                                stoplooping = true;
                             }
                         }
                         if(MainVariables.window){
                             if(!soundAlreadyWindowed){
                                 maximumVolume = maximumVolume - 0.2f;
                                 soundAlreadyWindowed = true;
-                                switchMPs();
+                                stoplooping = true;
                             }
                         }else{
                             if(soundAlreadyWindowed){
                                 maximumVolume = 0.5f;
                                 soundAlreadyWindowed = false;
-                                switchMPs();
+                                stoplooping = true;
                             }
                         }
+                        sleep(1500);
+                        if(!loop){
+                            loop();
+                        }
                     }
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         };
         thread.start();
+    }
+    public static String getKeyForTrueValue(Map<String, Boolean> map) {
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return entry.getKey();
+            }
+        }
+        return "silence";
     }
     @Nullable
     @Override
