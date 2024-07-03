@@ -4,30 +4,36 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.Animator;
-import android.content.Context;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.SoundEffectConstants;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.slider.Slider;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,21 +42,55 @@ public class MainActivity extends AppCompatActivity {
     Button[] sounds = new Button[5];
     String[] names;
     ImageView windowSheet;
-    String mode, name, selected, previousItem;
+    String selected, previousItem;
     ImageView rain1, settings;
     TextView transitionView;
+    private Map<Integer, String> soundEffectIds = new HashMap<>();
     boolean windowSelected, premium;
     int previousItemIndex = 0;
+    int spinnerSelection;
+    LinearLayout sliderMenu;
+    SeekBar volSlider;
+    boolean menuVisible = false;
+    ViewGroup rootLayout;
+    View currentButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(MainVariables.servicesRunning == null){
-            MainVariables.servicesRunning = false;
-        }
+        soundEffectIds.put(1, "thunder");
+        soundEffectIds.put(2, "traffic");
         setContentView(R.layout.activity_main);
+        volSlider = findViewById(R.id.volSlider);
+        volSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (currentButton != null) {
+                    String soundEffect = (String) currentButton.getTag();
+                    float volume = progress / 100.0f;
+                    MainVariables.volumeLevels.put(soundEffect, volume);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+        rootLayout = findViewById(R.id.root_layout);
+        rootLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (menuVisible) {
+                    hideMenu();
+                }
+                return false;
+            }
+        });
+        sliderMenu = findViewById(R.id.slider_menu);
         settings = findViewById(R.id.settings);
-        if(MainVariables.timer != 0){
+        if(MainVariables.timer > 0){
             timer();
         }
         if(getIntent().getBooleanExtra("init", false)){
@@ -85,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         SharedPreferences sp = getSharedPreferences("settings",0);
-        premium = sp.getBoolean("premium", false);
+        premium = sp.getBoolean("premium", true);
         String[] array_spinner;
         if(premium){
             array_spinner = new String[3];
@@ -106,17 +146,17 @@ public class MainActivity extends AppCompatActivity {
                 selected = spinner.getSelectedItem().toString();
                 SharedPreferences.Editor editor = getSharedPreferences("settings",0).edit();
                 editor.putInt("spinnerSelection", i);
+                spinnerSelection = i;
                 editor.apply();
                 animateRain();
-                MainVariables.path = getPath();
-                if(!MainVariables.servicesRunning){
-                    Intent sndIntent = new Intent(MainActivity.this, soundService.class);
-                    Intent sfxIntent = new Intent(MainActivity.this, sfxService.class);
-                    Intent thndIntent = new Intent(MainActivity.this, thunderService.class);
+                Intent sndIntent = new Intent(MainActivity.this, soundService.class);
+                sndIntent.setAction("CHANGE_SOUND");
+                sndIntent.putExtra("TRACK", trackName(spinnerSelection));
+                sndIntent.putExtra("WINDOW_EFFECT", windowSelected);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(sndIntent);
+                }else{
                     startService(sndIntent);
-                    startService(sfxIntent);
-                    startService(thndIntent);
-                    MainVariables.servicesRunning = true;
                 }
             }
 
@@ -131,35 +171,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void startSFX(Button button, String sound) {
+        boolean enableSound;
+        if(menuVisible){
+            hideMenu();
+        }
         Drawable pressed = getResources().getDrawable(getResources().getIdentifier(sound + "_pressed", "drawable", getPackageName()));
         Drawable notPressed = getResources().getDrawable(getResources().getIdentifier(sound, "drawable", getPackageName()));
         if(!sound.contains("prem")){
             //relates to randomly played sounds
-            for (String name : names) {
-                //disables other randomly played sounds
-                if (!name.contains("prem") && MainVariables.thundBooleans.get(name) && !name.equals(sound)) {
-                    Log.d("yeah2", name);
-                    int i = Arrays.asList(names).indexOf(name);
-                    sounds[i].setForeground(getResources().getDrawable(getResources()
-                            .getIdentifier(name, "drawable", getPackageName())));
-                    MainVariables.thundBooleans.put(name, false);
-                }
-            }
             if (MainVariables.thundBooleans.get(sound)) {
                 //if the sound is active, turn it off
+                enableSound = false;
                 button.setForeground(notPressed);
                 MainVariables.thundBooleans.put(sound, false);
             } else {
                 //if the sound is inactive, turn it on
+                enableSound = true;
                 button.setForeground(pressed);
                 MainVariables.thundBooleans.put(sound, true);
             }
+            Intent sndIntent = new Intent(MainActivity.this, randFreeSfx.class);
+            if (enableSound) {
+                sndIntent.setAction("PLAY_SOUND_EFFECT");
+            } else {
+                sndIntent.setAction("STOP_SOUND_EFFECT");
+            }
+            sndIntent.putExtra("EFFECT_NAME", sound);
+            startService(sndIntent);
         }else{
             //relates to premium sounds
             for (String name : names) {
                 //disables other premium sounds
                 if (name.contains("prem") && MainVariables.sfxBooleans.get(name) && !name.equals(sound)) {
-                    Log.d("yeah2", name);
                     int i = Arrays.asList(names).indexOf(name);
                     sounds[i].setForeground(getResources().getDrawable(getResources().getIdentifier(name, "drawable", getPackageName())));
                     MainVariables.sfxBooleans.put(name, false);
@@ -167,41 +210,20 @@ public class MainActivity extends AppCompatActivity {
             }
             if (MainVariables.sfxBooleans.get(sound)) {
                 //if the sound is active, turn it off
+                enableSound = false;
                 button.setForeground(notPressed);
                 MainVariables.sfxBooleans.put(sound, false);
-                Log.d("yeah", sound + " is false");
             } else {
                 //if the sound is inactive, turn it on
+                enableSound = true;
                 button.setForeground(pressed);
                 MainVariables.sfxBooleans.put(sound, true);
-                Log.d("yeah", sound + " is true");
             }
+            Intent sndIntent = new Intent(MainActivity.this, loopingPremSfx.class);
+            sndIntent.putExtra("EFFECT_NAME", sound);
+            startService(sndIntent);
         }
     }
-
-    String getPath() {
-        name = selected.toLowerCase();
-        if (windowSelected) {
-            mode = "window";
-            MainVariables.window = true;
-        } else {
-            mode = "base";
-            MainVariables.window = false;
-        }
-        String path = "android.resource://com.halicon.async/raw/" + name + "_" + mode;
-        if(Objects.equals(selected, "Off")){
-            path = "android.resource://com.halicon.async/raw/silence";
-            Glide.with(MainActivity.this)
-                    .load(R.drawable.empty)
-                    .transition(DrawableTransitionOptions.withCrossFade(4000))
-                    .apply(new RequestOptions().override(1080, 1920)
-                            .error(R.drawable.icon).centerCrop()
-                    )
-                    .into(rain1);
-        }
-        return path;
-    }
-
     void animateRain() {
         if (selected.equalsIgnoreCase("heavy")) {
             Glide.with(MainActivity.this)
@@ -211,9 +233,17 @@ public class MainActivity extends AppCompatActivity {
                             .error(R.drawable.icon).centerCrop()
                     )
                     .into(rain1);
-        } else {
+        } else if(selected.equalsIgnoreCase("soft")){
             Glide.with(MainActivity.this)
                     .load(R.drawable.light_rain)
+                    .transition(DrawableTransitionOptions.withCrossFade(4000))
+                    .apply(new RequestOptions().override(1080, 1920)
+                            .error(R.drawable.icon).centerCrop()
+                    )
+                    .into(rain1);
+        } else if(selected.equalsIgnoreCase("off")){
+            Glide.with(MainActivity.this)
+                    .load(R.drawable.empty)
                     .transition(DrawableTransitionOptions.withCrossFade(4000))
                     .apply(new RequestOptions().override(1080, 1920)
                             .error(R.drawable.icon).centerCrop()
@@ -226,10 +256,9 @@ public class MainActivity extends AppCompatActivity {
         if (!windowSelected) {
             window.setForeground(ResourcesCompat.getDrawable(getResources(), R.drawable.window_pressed, null));
             windowSelected = true;
-            MainVariables.path = getPath();
             Glide.with(MainActivity.this)
                     .load(R.drawable.window)
-                    .transition(DrawableTransitionOptions.withCrossFade(500))
+                    .transition(withCrossFade(500))
                     .apply(new RequestOptions().override(1080, 1920)
                             .error(R.drawable.icon).centerCrop()
                     )
@@ -237,17 +266,30 @@ public class MainActivity extends AppCompatActivity {
         } else {
             window.setForeground(ResourcesCompat.getDrawable(getResources(), R.drawable.windowbutton, null));
             windowSelected = false;
-            MainVariables.path = getPath();
             Glide.with(MainActivity.this)
                     .load(R.drawable.empty)
-                    .transition(DrawableTransitionOptions.withCrossFade(500))
+                    .transition(withCrossFade(500))
                     .apply(new RequestOptions().override(1080, 1920)
                             .error(R.drawable.icon).centerCrop()
                     )
                     .into(windowSheet);
         }
+        Intent sndIntent = new Intent(MainActivity.this, soundService.class);
+        sndIntent.setAction("SET_WINDOW_EFFECT");
+        sndIntent.putExtra("ENABLE", windowSelected);
+        startService(sndIntent);
     }
-
+    String trackName(int spinSel){
+        switch(spinSel){
+            case 0:
+                return "heavy";
+            case 1:
+                return "soft";
+            case 2:
+                return "silence";
+        }
+        return null;
+    }
     public void timer() {
         Thread thread = new Thread() {
             @Override
@@ -263,23 +305,34 @@ public class MainActivity extends AppCompatActivity {
         };
         thread.start();
     }
-    void initMenu(){
-        if(!Objects.equals(MainVariables.enabled, "")){
-            names=MainVariables.enabled.split(" ");
-            for(String name : names){
+    void initMenu() {
+        if (!Objects.equals(MainVariables.enabled, "")) {
+            names = MainVariables.enabled.split(" ");
+            for (String name : names) {
                 int i = Arrays.asList(names).indexOf(name);
                 sounds[i].setVisibility(View.VISIBLE);
-                sounds[i].setForeground(getResources().getDrawable(getResources()
-                        .getIdentifier(name, "drawable", getPackageName())));
+                sounds[i].setForeground(getResources().getDrawable(getResources().getIdentifier(name, "drawable", getPackageName())));
+                sounds[i].setTag(name); // Store sound effect name as a tag
+
                 sounds[i].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         startSFX((Button) view, name);
                     }
                 });
-                if(name.contains("prem")){
+
+                sounds[i].setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        currentButton = (Button) v;
+                        showMenu(v);
+                        return true; // Return true to indicate the event is consumed
+                    }
+                });
+
+                if (name.contains("prem")) {
                     MainVariables.sfxBooleans.put(name, false);
-                }else{
+                } else {
                     MainVariables.thundBooleans.put(name, false);
                 }
             }
@@ -311,5 +364,74 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+    private void showMenu(View anchorView) {
+        if(menuVisible){
+            hideMenu();
+        }
+        currentButton = (Button) anchorView;
+        String soundEffect = (String) currentButton.getTag(); // Retrieve the sound effect name from the button's tag
+        if(Boolean.TRUE.equals(MainVariables.thundBooleans.get(soundEffect))){
+            volSlider.setBackgroundResource(R.drawable.slider_pressed);
+        }else{volSlider.setBackgroundResource(R.drawable.slider);}
+        if(Boolean.TRUE.equals(MainVariables.sfxBooleans.get(soundEffect))){
+            volSlider.setBackgroundResource(R.drawable.slider_pressed);
+        }else{volSlider.setBackgroundResource(R.drawable.slider);}
+
+        // Set the slider's progress to the current volume for this sound effect
+        if (soundEffect != null) {
+            float currentVolume = MainVariables.volumeLevels.getOrDefault(soundEffect, 1.0f);
+            volSlider.setProgress((int) (currentVolume * 100));
+        }
+
+        menuVisible = true;
+
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(anchorView, "scaleX", 1.3f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(anchorView, "scaleY", 1.3f);
+        scaleX.setDuration(300);
+        scaleY.setDuration(300);
+        scaleX.setInterpolator(new DecelerateInterpolator());
+        scaleY.setInterpolator(new DecelerateInterpolator());
+
+        scaleX.start();
+        scaleY.start();
+
+        int[] location = new int[2];
+        anchorView.getLocationOnScreen(location);
+
+        sliderMenu.setVisibility(View.VISIBLE);
+        sliderMenu.setAlpha(0f);
+        sliderMenu.animate().alpha(1f).setDuration(300).start();
+
+        int buttonHeight = anchorView.getHeight();
+        int buttonWidth = anchorView.getWidth();
+
+        sliderMenu.setTranslationX(location[0] + buttonWidth);
+        sliderMenu.setTranslationY(location[1] - buttonHeight*0.2f);
+
+        sliderMenu.setTranslationX(-sliderMenu.getWidth()*0.1f);
+        sliderMenu.animate().translationX(location[0] + buttonWidth*1.2f).setDuration(300).start();
+    }
+
+    private void hideMenu() {
+        menuVisible = false;
+        for (Button bt : sounds) {
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(bt, "scaleX", 1f);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(bt, "scaleY", 1f);
+            scaleX.setDuration(300);
+            scaleY.setDuration(300);
+            scaleX.setInterpolator(new DecelerateInterpolator());
+            scaleY.setInterpolator(new DecelerateInterpolator());
+
+            scaleX.start();
+            scaleY.start();
+        }
+
+        sliderMenu.animate().alpha(0f).translationX(-sliderMenu.getWidth()*0.1f).setDuration(300).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                sliderMenu.setVisibility(View.GONE);
+            }
+        }).start();
     }
 }

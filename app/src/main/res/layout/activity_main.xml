@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="#A4C3D2"
+    android:id="@+id/root_layout"
     android:fillViewport="true"
     style="@style/ThemeActionBar"
     tools:context=".MainActivity">
@@ -32,6 +33,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/slider_menu"
+        android:layout_width="129dp"
+        android:layout_height="38dp"
+        android:background="@drawable/slider"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <SeekBar
+            android:id="@+id/volSlider"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:progressTint="#EFEFEF"
+            android:thumbTint="#EFEFEF" />
+
+    </LinearLayout>
 
     <Spinner
         android:id="@+id/spinner"

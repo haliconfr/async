@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -67,7 +69,7 @@ public class Settings extends AppCompatActivity {
             setIcon(v);
         }
         SharedPreferences sp = getSharedPreferences("settings",0);
-        premium = sp.getBoolean("premium", false);
+        premium = sp.getBoolean("premium", true);
         transitionView = findViewById(R.id.setTransition);
         transitionView.setAlpha(1);
         transitionView.animate().alpha(0.0f).setDuration(500);
@@ -229,6 +231,7 @@ public class Settings extends AppCompatActivity {
             public void onBillingServiceDisconnected() {
                 // Try to restart the connection on the next request to
                 // Google Play by calling the startConnection() method.
+                Toast.makeText(Settings.this, "mf worried bout the wrong liquid grelp", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -242,6 +245,7 @@ public class Settings extends AppCompatActivity {
                 }
             } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
                 restartClass();
+                Toast.makeText(Settings.this, "Refreshing past purchase...", Toast.LENGTH_SHORT).show();
             }
         }
     };

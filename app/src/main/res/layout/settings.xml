@@ -37,10 +37,42 @@
         android:tag="traffic"
         app:layout_constraintBottom_toBottomOf="@+id/thunderSet"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintHorizontal_bias="0.09"
         app:layout_constraintStart_toEndOf="@+id/thunderSet"
         app:layout_constraintTop_toTopOf="@+id/thunderSet"
         app:layout_constraintVertical_bias="0.050000012" />
+
+    <Button
+        android:id="@+id/birdsSet"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:clickable="true"
+        android:contentDescription="@string/thunder_desc"
+        android:focusable="true"
+        android:foreground="@drawable/traffic"
+        android:tag="traffic"
+        app:layout_constraintBottom_toTopOf="@+id/trafficText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.14"
+        app:layout_constraintStart_toEndOf="@+id/trafficSet"
+        app:layout_constraintTop_toTopOf="@+id/trafficSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/trafficSet3"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:clickable="true"
+        android:contentDescription="@string/thunder_desc"
+        android:focusable="true"
+        android:foreground="@drawable/traffic"
+        android:tag="traffic"
+        app:layout_constraintBottom_toBottomOf="@+id/birdsSet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintStart_toEndOf="@+id/birdsSet"
+        app:layout_constraintTop_toTopOf="@+id/birdsSet"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Spinner
         android:id="@+id/timer"
@@ -87,7 +119,7 @@
         android:tag="premcicadas"
         app:layout_constraintBottom_toBottomOf="@+id/streamSet"
         app:layout_constraintEnd_toEndOf="@+id/trafficSet"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/trafficSet"
         app:layout_constraintTop_toBottomOf="@+id/trafficSet"
         app:layout_constraintVertical_bias="1.0" />
@@ -102,9 +134,25 @@
         android:foreground="@drawable/premcafe"
         android:tag="premcafe"
         app:layout_constraintBottom_toBottomOf="@+id/cicadaSet"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/birdsSet"
         app:layout_constraintHorizontal_bias="0.13"
-        app:layout_constraintStart_toEndOf="@+id/cicadaSet"
+        app:layout_constraintStart_toStartOf="@+id/birdsSet"
+        app:layout_constraintTop_toBottomOf="@+id/trafficSet"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/clockSet"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:clickable="true"
+        android:contentDescription="@string/thunder_desc"
+        android:focusable="true"
+        android:foreground="@drawable/premclock"
+        android:tag="premcicadas"
+        app:layout_constraintBottom_toBottomOf="@+id/streamSet"
+        app:layout_constraintEnd_toEndOf="@+id/trafficSet3"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/trafficSet3"
         app:layout_constraintTop_toBottomOf="@+id/trafficSet"
         app:layout_constraintVertical_bias="1.0" />
 
@@ -159,6 +207,24 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
+        android:id="@+id/birdsText"
+        android:layout_width="79dp"
+        android:layout_height="21dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="birds"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/birdsSet"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/birdsSet"
+        app:layout_constraintTop_toBottomOf="@+id/trafficSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
         android:id="@+id/cafeText"
         android:layout_width="79dp"
         android:layout_height="21dp"
@@ -174,6 +240,24 @@
         app:layout_constraintHorizontal_bias="0.3"
         app:layout_constraintStart_toStartOf="@+id/cafeSet"
         app:layout_constraintTop_toBottomOf="@+id/cafeSet"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/clockText"
+        android:layout_width="79dp"
+        android:layout_height="21dp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:text="clock"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/sleepText"
+        app:layout_constraintEnd_toEndOf="@+id/clockSet"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="@+id/clockSet"
+        app:layout_constraintTop_toBottomOf="@+id/clockSet"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
@@ -245,12 +329,14 @@
         android:id="@+id/setTransition"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#A4C3D2"
         android:alpha="0"
+        android:background="#A4C3D2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
         android:id="@+id/startSet"
