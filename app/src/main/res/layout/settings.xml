@@ -49,29 +49,13 @@
         android:clickable="true"
         android:contentDescription="@string/thunder_desc"
         android:focusable="true"
-        android:foreground="@drawable/traffic"
+        android:foreground="@drawable/birds"
         android:tag="traffic"
         app:layout_constraintBottom_toTopOf="@+id/trafficText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.14"
         app:layout_constraintStart_toEndOf="@+id/trafficSet"
         app:layout_constraintTop_toTopOf="@+id/trafficSet"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
-        android:id="@+id/trafficSet3"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:clickable="true"
-        android:contentDescription="@string/thunder_desc"
-        android:focusable="true"
-        android:foreground="@drawable/traffic"
-        android:tag="traffic"
-        app:layout_constraintBottom_toBottomOf="@+id/birdsSet"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
-        app:layout_constraintStart_toEndOf="@+id/birdsSet"
-        app:layout_constraintTop_toTopOf="@+id/birdsSet"
         app:layout_constraintVertical_bias="0.0" />
 
     <Spinner
@@ -149,12 +133,11 @@
         android:focusable="true"
         android:foreground="@drawable/premclock"
         android:tag="premcicadas"
-        app:layout_constraintBottom_toBottomOf="@+id/streamSet"
-        app:layout_constraintEnd_toEndOf="@+id/trafficSet3"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/trafficSet3"
-        app:layout_constraintTop_toBottomOf="@+id/trafficSet"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintBottom_toTopOf="@+id/birdsText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/birdsSet"
+        app:layout_constraintTop_toTopOf="@+id/birdsSet"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/streamSet"
@@ -333,7 +316,7 @@
         android:background="#A4C3D2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />

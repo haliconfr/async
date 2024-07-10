@@ -34,8 +34,8 @@ import java.util.List;
 
 public class Settings extends AppCompatActivity {
     Spinner spinner;
-    View[] icons = new View[2];
-    View[] moreIcons = new View[3];
+    View[] icons = new View[3];
+    View[] moreIcons = new View[4];
     ImageView start, indicator;
     TextView transitionView, premiumLock;
     BillingClient billingClient;
@@ -65,6 +65,7 @@ public class Settings extends AppCompatActivity {
         });
         icons[0] = findViewById(R.id.thunderSet);
         icons[1] = findViewById(R.id.trafficSet);
+        icons[2] = findViewById(R.id.birdsSet);
         for(View v : icons){
             setIcon(v);
         }
@@ -80,9 +81,12 @@ public class Settings extends AppCompatActivity {
             moreIcons[0] = findViewById(R.id.streamSet);
             moreIcons[1] = findViewById(R.id.cafeSet);
             moreIcons[2] = findViewById(R.id.cicadaSet);
+            moreIcons[3] = findViewById(R.id.clockSet);
             for(View v : moreIcons){
                 setIcon(v);
             }
+        }else{
+            moreIcons[0] = findViewById(R.id.clockSet);
         }
         premiumLock.setOnClickListener(new View.OnClickListener() {
             @Override
