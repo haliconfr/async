@@ -164,6 +164,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.97" />
 
+    <Button
+        android:id="@+id/sound6"
+        android:layout_width="62dp"
+        android:layout_height="61dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/thunder"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/sound5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.04"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.95" />
+
     <TextView
         android:id="@+id/transition2"
         android:layout_width="fill_parent"

@@ -50,7 +50,7 @@
         android:contentDescription="@string/thunder_desc"
         android:focusable="true"
         android:foreground="@drawable/birds"
-        android:tag="traffic"
+        android:tag="birds"
         app:layout_constraintBottom_toTopOf="@+id/trafficText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.14"
@@ -93,7 +93,7 @@
         app:layout_constraintVertical_bias="0.00999999" />
 
     <Button
-        android:id="@+id/cicadaSet"
+        android:id="@+id/cicadasSet"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:clickable="true"
@@ -117,7 +117,7 @@
         android:focusable="true"
         android:foreground="@drawable/premcafe"
         android:tag="premcafe"
-        app:layout_constraintBottom_toBottomOf="@+id/cicadaSet"
+        app:layout_constraintBottom_toBottomOf="@+id/cicadasSet"
         app:layout_constraintEnd_toEndOf="@+id/birdsSet"
         app:layout_constraintHorizontal_bias="0.13"
         app:layout_constraintStart_toStartOf="@+id/birdsSet"
@@ -132,7 +132,7 @@
         android:contentDescription="@string/thunder_desc"
         android:focusable="true"
         android:foreground="@drawable/premclock"
-        android:tag="premcicadas"
+        android:tag="premclock"
         app:layout_constraintBottom_toTopOf="@+id/birdsText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/birdsSet"
@@ -272,8 +272,8 @@
         android:textStyle="bold"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/sleepText"
-        app:layout_constraintEnd_toEndOf="@+id/cicadaSet"
-        app:layout_constraintStart_toStartOf="@+id/cicadaSet"
+        app:layout_constraintEnd_toEndOf="@+id/cicadasSet"
+        app:layout_constraintStart_toStartOf="@+id/cicadasSet"
         app:layout_constraintTop_toBottomOf="@+id/streamSet"
         app:layout_constraintVertical_bias="0.0" />
 

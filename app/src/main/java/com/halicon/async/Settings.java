@@ -41,6 +41,7 @@ public class Settings extends AppCompatActivity {
     BillingClient billingClient;
     ProductDetails productDetails;
     Boolean premium;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +50,7 @@ public class Settings extends AppCompatActivity {
                 .enablePendingPurchases()
                 .build();
         setContentView(R.layout.settings);
+
         indicator = findViewById(R.id.tick);
         indicator.setAlpha(0.0f);
         start = findViewById(R.id.startSet);
@@ -63,14 +65,16 @@ public class Settings extends AppCompatActivity {
                 transition();
             }
         });
+
         icons[0] = findViewById(R.id.thunderSet);
         icons[1] = findViewById(R.id.trafficSet);
         icons[2] = findViewById(R.id.birdsSet);
         for(View v : icons){
             setIcon(v);
         }
+
         SharedPreferences sp = getSharedPreferences("settings",0);
-        premium = sp.getBoolean("premium", true);
+        premium = sp.getBoolean("premium", false);
         transitionView = findViewById(R.id.setTransition);
         transitionView.setAlpha(1);
         transitionView.animate().alpha(0.0f).setDuration(500);
@@ -80,27 +84,31 @@ public class Settings extends AppCompatActivity {
             premiumLock.setVisibility(View.GONE);
             moreIcons[0] = findViewById(R.id.streamSet);
             moreIcons[1] = findViewById(R.id.cafeSet);
-            moreIcons[2] = findViewById(R.id.cicadaSet);
+            moreIcons[2] = findViewById(R.id.cicadasSet);
             moreIcons[3] = findViewById(R.id.clockSet);
             for(View v : moreIcons){
                 setIcon(v);
             }
-        }else{
+        } else {
             moreIcons[0] = findViewById(R.id.clockSet);
+            for(View v : moreIcons){
+                setIcon(v);
+            }
         }
+
         premiumLock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 buyPremium();
             }
         });
+
         String[] array_spinner = new String[4];
         array_spinner[0] = "8 hours";
         array_spinner[1] = "2 hours";
         array_spinner[2] = "30 mins";
         array_spinner[3] = "off";
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(this, R.layout.list_item, R.id.itemText, array_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item, R.id.itemText, array_spinner);
         spinner.setAdapter(adapter);
         switch(MainVariables.timer){
             case(0):
@@ -116,6 +124,7 @@ public class Settings extends AppCompatActivity {
                 spinner.setSelection(0);
                 break;
         }
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -143,31 +152,38 @@ public class Settings extends AppCompatActivity {
             }
         });
     }
-    void addSound(View view){
+
+    void addSound(View view, boolean fixing){
+        if(MainVariables.enabled.split(" ").length > 6 && !fixing){
+            Log.d("BUTTONTAG", MainVariables.enabled.split(" ")[1]);
+            addSound(getViewFromTag(MainVariables.enabled.split(" ")[1]), true);
+        }
         if(!MainVariables.enabled.contains(view.getTag().toString())){
             MainVariables.enabled = MainVariables.enabled + view.getTag().toString() + " ";
             view.setForeground(getResources().getDrawable(getResources()
                     .getIdentifier(view.getTag().toString() +  "_pressed", "drawable", getPackageName())));
             animateTick((Button) view, true);
-        }else{
+        } else {
             MainVariables.enabled = MainVariables.enabled.replace(view.getTag().toString() + " ", "");
             view.setForeground(getResources().getDrawable(getResources()
                     .getIdentifier(view.getTag().toString(), "drawable", getPackageName())));
             animateTick((Button) view, false);
         }
     }
+
     void setIcon(View view){
-        if(MainVariables.enabled.contains(view.getTag().toString())) {
+        if(MainVariables.enabled.contains(view.getTag().toString())){
             view.setForeground(getResources().getDrawable(getResources()
                     .getIdentifier(view.getTag().toString() +  "_pressed", "drawable", getPackageName())));
         }
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addSound(v);
+                addSound(v, false);
             }
         });
     }
+
     void transition(){
         transitionView.animate().alpha(1.0f).setDuration(500).setListener(new Animator.AnimatorListener() {
             @Override
@@ -194,6 +210,7 @@ public class Settings extends AppCompatActivity {
             }
         });
     }
+
     void buyPremium(){
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
@@ -239,6 +256,7 @@ public class Settings extends AppCompatActivity {
             }
         });
     }
+
     private PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
         @Override
         public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
@@ -266,12 +284,14 @@ public class Settings extends AppCompatActivity {
             restartClass();
         }
     }
+
     AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
         @Override
         public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
 
         }
     };
+
     void restartClass(){
         SharedPreferences.Editor editor = getSharedPreferences("settings",0).edit();
         editor.putBoolean("premium", true);
@@ -301,6 +321,7 @@ public class Settings extends AppCompatActivity {
             }
         });
     }
+
     void animateTick(Button button, boolean tick){
         indicator.setAlpha(1.0f);
         if(tick){
@@ -312,5 +333,10 @@ public class Settings extends AppCompatActivity {
         indicator.setY(button.getY()-90);
         indicator.animate().alpha(0.0f).setDuration(500);
         indicator.animate().x(button.getX()+65).y(button.getY()-115).setDuration(300);
+    }
+
+    View getViewFromTag(String tag){
+        int id = getResources().getIdentifier(tag.replace("prem", "") + "Set", "id", getPackageName());
+        return findViewById(id);
     }
 }

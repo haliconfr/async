@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
     Spinner spinner;
     Button window;
-    Button[] sounds = new Button[5];
+    Button[] sounds = new Button[6];
     String[] names;
     ImageView windowSheet;
     String selected, previousItem;
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         sounds[2] = findViewById(R.id.sound3);
         sounds[3] = findViewById(R.id.sound4);
         sounds[4] = findViewById(R.id.sound5);
+        sounds[5] = findViewById(R.id.sound6);
         initMenu();
         window.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         SharedPreferences sp = getSharedPreferences("settings",0);
-        premium = sp.getBoolean("premium", true);
+        premium = sp.getBoolean("premium", false);
         String[] array_spinner;
         if(premium){
             array_spinner = new String[3];
@@ -198,16 +200,8 @@ public class MainActivity extends AppCompatActivity {
             }
             sndIntent.putExtra("EFFECT_NAME", sound);
             startService(sndIntent);
-        }else{
+        } else {
             //relates to premium sounds
-            for (String name : names) {
-                //disables other premium sounds
-                if (name.contains("prem") && MainVariables.sfxBooleans.get(name) && !name.equals(sound)) {
-                    int i = Arrays.asList(names).indexOf(name);
-                    sounds[i].setForeground(getResources().getDrawable(getResources().getIdentifier(name, "drawable", getPackageName())));
-                    MainVariables.sfxBooleans.put(name, false);
-                }
-            }
             if (MainVariables.sfxBooleans.get(sound)) {
                 //if the sound is active, turn it off
                 enableSound = false;
@@ -306,8 +300,8 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
     void initMenu() {
-        if (!Objects.equals(MainVariables.enabled, "")) {
-            names = MainVariables.enabled.split(" ");
+        names = MainVariables.enabled.trim().split(" ");
+        if (!names[0].isEmpty()) {
             for (String name : names) {
                 int i = Arrays.asList(names).indexOf(name);
                 sounds[i].setVisibility(View.VISIBLE);
@@ -371,10 +365,7 @@ public class MainActivity extends AppCompatActivity {
         }
         currentButton = (Button) anchorView;
         String soundEffect = (String) currentButton.getTag(); // Retrieve the sound effect name from the button's tag
-        if(Boolean.TRUE.equals(MainVariables.thundBooleans.get(soundEffect))){
-            volSlider.setBackgroundResource(R.drawable.slider_pressed);
-        }else{volSlider.setBackgroundResource(R.drawable.slider);}
-        if(Boolean.TRUE.equals(MainVariables.sfxBooleans.get(soundEffect))){
+        if(Boolean.TRUE.equals(MainVariables.thundBooleans.get(soundEffect)) || Boolean.TRUE.equals(MainVariables.sfxBooleans.get(soundEffect))){
             volSlider.setBackgroundResource(R.drawable.slider_pressed);
         }else{volSlider.setBackgroundResource(R.drawable.slider);}
 
