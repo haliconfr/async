@@ -5,10 +5,10 @@
     style="@style/ThemeActionBar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#77B4D1"
+    android:background="#A3C2D1"
     android:fillViewport="true"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/textView"
@@ -31,44 +31,47 @@
         android:id="@+id/walkthrough1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:contentDescription="@string/contrl_yr_sfx"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/setTransition"
         app:layout_constraintStart_toStartOf="@+id/setTransition"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/walkthrough1"></ImageView>
+        app:srcCompat="@drawable/walkthrough1" />
 
     <ImageView
         android:id="@+id/walkthrough2"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:contentDescription="@string/cstmze_yr_hme_scrn"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/setTransition"
         app:layout_constraintStart_toStartOf="@+id/setTransition"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/walkthrough2"></ImageView>
+        app:srcCompat="@drawable/walkthrough2"/>
 
     <ImageView
         android:id="@+id/walkthrough3"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:contentDescription="@string/tp_to_strt_yr_sfx"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/setTransition"
         app:layout_constraintStart_toStartOf="@+id/setTransition"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/walkthrough3"></ImageView>
+        app:srcCompat="@drawable/walkthrough3"/>
 
     <TextView
         android:id="@+id/setTransition"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#A4C3D2"
         android:alpha="0"
+        android:background="#A4C3D2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

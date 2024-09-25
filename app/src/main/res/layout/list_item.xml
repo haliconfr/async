@@ -4,8 +4,9 @@
     android:layout_height="wrap_content"
     android:background="@android:color/transparent">
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
         android:id="@+id/itemText"
+        android:contentDescription="@string/rhsDesc"
         android:layout_width="366dp"
         android:layout_height="63dp"
         android:background="@drawable/button2"

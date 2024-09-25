@@ -3,15 +3,15 @@ plugins {
 }
 
 android {
-    namespace 'com.halicon.async'
+    namespace 'com.haliconfr.async'
     compileSdkVersion 34
 
     defaultConfig {
-        applicationId "com.halicon.async"
+        applicationId "com.haliconfr.async"
         minSdk 24
         targetSdk 34
-        versionCode 7
-        versionName "1.7"
+        versionCode 1
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,7 +42,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'com.github.lincollincol:AudioTool:1.2.1'
-    implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1.LTS'
     implementation 'com.google.android.exoplayer:exoplayer:2.18.3'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.18.3'
 }

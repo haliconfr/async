@@ -13,10 +13,10 @@
 
     <ImageView
         android:id="@+id/rain1"
-        android:scaleType="fitXY"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:contentDescription="@string/gif_desc"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,6 +25,7 @@
 
     <ImageView
         android:id="@+id/windowSheet"
+        android:contentDescription="@string/rainDesc"
         android:scaleType="fitXY"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -40,7 +41,8 @@
         android:layout_height="38dp"
         android:background="@drawable/slider"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:ignore="MissingConstraints">
 
         <SeekBar
             android:id="@+id/volSlider"
@@ -48,6 +50,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:contentDescription="@string/volsliderDesc"
             android:progressTint="#EFEFEF"
             android:thumbTint="#EFEFEF" />
 
@@ -130,7 +133,7 @@
         app:layout_constraintHorizontal_bias="0.045"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.97" />
+        app:layout_constraintVertical_bias="0.98" />
 
     <Button
         android:id="@+id/sound4"
@@ -178,7 +181,7 @@
         app:layout_constraintHorizontal_bias="0.04"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95" />
+        app:layout_constraintVertical_bias="0.96" />
 
     <TextView
         android:id="@+id/transition2"
@@ -198,6 +201,7 @@
         android:layout_width="55dp"
         android:layout_height="55dp"
         android:clickable="true"
+        android:contentDescription="@string/settingsDesc"
         android:focusable="true"
         android:foreground="@drawable/settings"
         app:layout_constraintBottom_toTopOf="@+id/spinner"

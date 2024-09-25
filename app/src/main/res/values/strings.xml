@@ -10,4 +10,21 @@
     <string name="start_desc">starts the application</string>
     <string name="title_desc">the title of the application</string>
     <string name="settings">settings</string>
+    <string name="rainDesc">Rain</string>
+    <string name="volsliderDesc">Volume slider</string>
+    <string name="settingsDesc">Settings button</string>
+    <string name="rhsDesc">Rain heaviness selector</string>
+    <string name="settingsTitle">edit menu</string>
+    <string name="thunder">thunder</string>
+    <string name="traffic">traffic</string>
+    <string name="birds">birds</string>
+    <string name="cafe">cafe</string>
+    <string name="clock">clock</string>
+    <string name="stream">stream</string>
+    <string name="cicadas">cicadas</string>
+    <string name="sleep_timer">sleep timer</string>
+    <string name="tick_or_cross_depending_on_sound_selection">Tick or cross, depending on sound selection</string>
+    <string name="contrl_yr_sfx">Control your sound effects</string>
+    <string name="cstmze_yr_hme_scrn">Customize your home screen</string>
+    <string name="tp_to_strt_yr_sfx">Tap to start your sound effects</string>
 </resources>
